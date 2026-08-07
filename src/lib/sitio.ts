@@ -16,7 +16,7 @@ export const sitio = {
    * propuesta, no una suplantación. Al cerrar el trabajo se reemplaza por el dominio
    * definitivo, que debe quedar registrado a nombre del cliente.
    */
-  url: "https://ynny-propuesta.vercel.app",
+  url: "https://ynny-omega.vercel.app",
 
   /** Con esto en true el sitio se marca como propuesta y se excluye de los buscadores. */
   esDemo: true,
