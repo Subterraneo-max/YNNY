@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
+import { IlustracionProducto, TIPO_POR_CATEGORIA } from "@/components/IlustracionProducto";
 import { categorias, formatearPrecio, todosLosProductos } from "@/data/menu";
 
 /** Para que "arabe" encuentre "Árabe" y "cafe" encuentre "café". */
@@ -25,14 +26,16 @@ function FilaProducto({
   ocultarPrecio?: boolean;
 }) {
   return (
-    <li className="flex items-baseline gap-3 py-3">
+    <li className="group flex items-baseline gap-3 py-3.5">
       <div className="min-w-0 flex-1">
-        <p className="font-semibold leading-snug">{nombre}</p>
+        <p className="font-semibold leading-snug transition-colors group-hover:text-lima-hondo">
+          {nombre}
+        </p>
         {descripcion && (
-          <p className="mt-0.5 text-sm leading-snug text-tinta-suave">{descripcion}</p>
+          <p className="mt-0.5 text-sm leading-snug text-cacao-suave">{descripcion}</p>
         )}
         {contexto && (
-          <p className="mt-1 text-xs font-medium uppercase tracking-wide text-lima-hondo">
+          <p className="mt-1 text-xs font-bold tracking-wider text-lima-hondo uppercase">
             {contexto}
           </p>
         )}
@@ -46,9 +49,9 @@ function FilaProducto({
             className="mb-1 hidden min-w-6 flex-1 border-b border-dotted border-borde sm:block"
           />
           {precio === null ? (
-            <span className="text-sm text-tinta-suave">Consultar</span>
+            <span className="text-sm text-cacao-suave">Consultar</span>
           ) : (
-            <span className="font-bold tabular-nums">{formatearPrecio(precio)}</span>
+            <span className="display text-lg tabular-nums">{formatearPrecio(precio)}</span>
           )}
         </>
       )}
@@ -56,8 +59,26 @@ function FilaProducto({
   );
 }
 
+/** El hash de la URL es estado del navegador, no de React: se lee suscribiéndose. */
+function suscribirAlHash(alCambiar: () => void) {
+  window.addEventListener("hashchange", alCambiar);
+  return () => window.removeEventListener("hashchange", alCambiar);
+}
+
 export function CartaNavegable() {
-  const [busqueda, setBusqueda] = useState("");
+  // El buscador del hero manda el término por el hash (#q=…) para que esta página
+  // siga siendo estática. En el servidor no hay hash, de ahí el tercer argumento.
+  const hash = useSyncExternalStore(
+    suscribirAlHash,
+    () => window.location.hash,
+    () => "",
+  );
+
+  const [escrito, setEscrito] = useState<string | null>(null);
+
+  // Mientras nadie haya tocado el input manda el hash; después manda lo escrito.
+  const busqueda =
+    escrito ?? (hash.startsWith("#q=") ? decodeURIComponent(hash.slice(3)) : "");
 
   const resultados = useMemo(() => {
     const termino = normalizar(busqueda.trim());
@@ -71,7 +92,7 @@ export function CartaNavegable() {
 
   return (
     <>
-      <div className="sticky top-[6.5rem] z-30 -mx-4 border-b border-borde bg-crema/95 px-4 py-3 backdrop-blur">
+      <div className="sticky top-[5.6rem] z-30 -mx-4 border-y border-borde bg-crema/95 px-4 py-3 backdrop-blur-md">
         <label className="sr-only" htmlFor="buscar">
           Buscar en la carta
         </label>
@@ -79,9 +100,9 @@ export function CartaNavegable() {
           id="buscar"
           type="search"
           value={busqueda}
-          onChange={(evento) => setBusqueda(evento.target.value)}
+          onChange={(evento) => setEscrito(evento.target.value)}
           placeholder="Buscar: medialunas, palta, empanadas…"
-          className="w-full rounded-full border border-borde bg-crema px-4 py-2.5 text-sm outline-none transition placeholder:text-tinta-suave/70 focus:border-lima-hondo focus:ring-2 focus:ring-lima"
+          className="w-full border border-cacao/25 bg-transparent px-4 py-3 text-sm outline-none transition placeholder:text-cacao-suave/70 focus:border-cacao"
         />
 
         {!resultados && (
@@ -93,7 +114,7 @@ export function CartaNavegable() {
               <a
                 key={categoria.slug}
                 href={`#${categoria.slug}`}
-                className="shrink-0 rounded-full border border-borde px-3.5 py-1.5 text-sm font-semibold transition hover:border-lima-hondo hover:bg-lima/20"
+                className="shrink-0 border border-cacao/25 px-3.5 py-1.5 text-sm font-semibold transition hover:border-cacao hover:bg-cacao hover:text-crema"
               >
                 {categoria.nombre}
               </a>
@@ -102,77 +123,95 @@ export function CartaNavegable() {
         )}
       </div>
 
-      {resultados ? (
-        <section className="mt-8" aria-live="polite">
-          <h2 className="titular text-2xl">
-            {resultados.length === 0
-              ? "Sin resultados"
-              : `${resultados.length} ${resultados.length === 1 ? "resultado" : "resultados"}`}
-          </h2>
-          {resultados.length === 0 ? (
-            <p className="mt-3 text-tinta-suave">
-              No encontramos nada con “{busqueda}”. Probá con otra palabra o mirá la carta
-              completa borrando la búsqueda.
-            </p>
-          ) : (
-            <ul className="mt-2 divide-y divide-borde">
-              {resultados.map((producto, indice) => (
-                <FilaProducto
-                  key={`${producto.categoriaSlug}-${producto.nombre}-${indice}`}
-                  nombre={producto.nombre}
-                  descripcion={producto.descripcion}
-                  precio={producto.precio}
-                  contexto={
-                    producto.grupoNombre
-                      ? `${producto.categoriaNombre} · ${producto.grupoNombre}`
-                      : producto.categoriaNombre
-                  }
-                />
-              ))}
-            </ul>
-          )}
-        </section>
-      ) : (
-        categorias.map((categoria) => (
-          <section key={categoria.slug} id={categoria.slug} className="mt-12 scroll-mt-44">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b-2 border-tinta pb-2">
-              <h2 className="titular text-3xl">{categoria.nombre}</h2>
-              {categoria.precioUnico && (
-                <p className="text-sm font-bold text-lima-hondo">
-                  Todas {formatearPrecio(categoria.precioUnico)}
-                </p>
-              )}
-            </div>
-
-            {categoria.nota && (
-              <p className="mt-3 text-sm leading-relaxed text-tinta-suave">{categoria.nota}</p>
+              {resultados ? (
+          <section
+            className="entra mt-10"
+            aria-live="polite"
+          >
+            <h2 className="display text-2xl">
+              {resultados.length === 0
+                ? "Sin resultados"
+                : `${resultados.length} ${resultados.length === 1 ? "resultado" : "resultados"}`}
+            </h2>
+            {resultados.length === 0 ? (
+              <p className="mt-3 text-cacao-suave">
+                No encontramos nada con “{busqueda}”. Probá con otra palabra o mirá la carta
+                completa borrando la búsqueda.
+              </p>
+            ) : (
+              <ul className="mt-2 divide-y divide-borde">
+                {resultados.map((producto, indice) => (
+                  <FilaProducto
+                    key={`${producto.categoriaSlug}-${producto.nombre}-${indice}`}
+                    nombre={producto.nombre}
+                    descripcion={producto.descripcion}
+                    precio={producto.precio}
+                    contexto={
+                      producto.grupoNombre
+                        ? `${producto.categoriaNombre} · ${producto.grupoNombre}`
+                        : producto.categoriaNombre
+                    }
+                  />
+                ))}
+              </ul>
             )}
-
-            {categoria.grupos.map((grupo, indice) => (
-              <div key={grupo.nombre ?? indice} className="mt-5">
-                {grupo.nombre && (
-                  <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-tinta-suave">
-                    {grupo.nombre}
-                  </h3>
-                )}
-                <ul className="divide-y divide-borde">
-                  {grupo.productos.map((producto) => (
-                    <FilaProducto
-                      key={producto.nombre}
-                      nombre={producto.nombre}
-                      descripcion={producto.descripcion}
-                      precio={producto.precio}
-                      // Si toda la categoría vale lo mismo ya se anunció arriba:
-                      // repetirlo en cada renglón sólo agrega ruido.
-                      ocultarPrecio={categoria.precioUnico !== undefined}
-                    />
-                  ))}
-                </ul>
-              </div>
-            ))}
           </section>
-        ))
-      )}
+        ) : (
+          <div>
+            {categorias.map((categoria) => (
+              <section key={categoria.slug} id={categoria.slug} className="mt-16 scroll-mt-44">
+                <div
+                  className="flex items-end gap-4 border-b-2 border-cacao pb-3"
+                >
+                  <IlustracionProducto
+                    tipo={TIPO_POR_CATEGORIA[categoria.slug] ?? "plato"}
+                    nombre={categoria.nombre}
+                    className="w-16 shrink-0 sm:w-20"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <h2 className="display text-[clamp(1.6rem,6vw,2.8rem)]">
+                      {categoria.nombre}
+                    </h2>
+                  </div>
+                  {categoria.precioUnico && (
+                    <p className="display shrink-0 pb-1 text-lg text-lima-hondo">
+                      Todas {formatearPrecio(categoria.precioUnico)}
+                    </p>
+                  )}
+                </div>
+
+                {categoria.nota && (
+                  <p className="mt-3 text-sm leading-relaxed text-cacao-suave">
+                    {categoria.nota}
+                  </p>
+                )}
+
+                {categoria.grupos.map((grupo, indice) => (
+                  <div key={grupo.nombre ?? indice} className="mt-6">
+                    {grupo.nombre && (
+                      <h3 className="text-xs font-bold tracking-[0.18em] text-cacao-suave uppercase">
+                        {grupo.nombre}
+                      </h3>
+                    )}
+                    <ul className="divide-y divide-borde">
+                      {grupo.productos.map((producto) => (
+                        <FilaProducto
+                          key={producto.nombre}
+                          nombre={producto.nombre}
+                          descripcion={producto.descripcion}
+                          precio={producto.precio}
+                          // Si toda la categoría vale lo mismo ya se anunció arriba:
+                          // repetirlo en cada renglón sólo agrega ruido.
+                          ocultarPrecio={categoria.precioUnico !== undefined}
+                        />
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </section>
+            ))}
+          </div>
+        )}
     </>
   );
 }

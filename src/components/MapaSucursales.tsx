@@ -71,7 +71,7 @@ export function MapaSucursales({
               cx={x}
               cy={y}
               r={destacada ? 3.6 : 2.4}
-              fill={destacada ? "var(--color-lima-hondo)" : "var(--color-tinta)"}
+              fill={destacada ? "var(--color-lima-hondo)" : "var(--color-cacao)"}
               stroke="var(--color-crema)"
               strokeWidth="1"
             />

@@ -48,11 +48,13 @@ export function ListaSucursales({ sucursales }: { sucursales: Sucursal[] }) {
 
   return (
     <>
-      <div className="rounded-3xl border border-borde bg-crema-hondo p-5 sm:p-7">
-        <div className="grid items-center gap-6 sm:grid-cols-[1fr_auto]">
+      <div className="bg-crema-hondo p-6 sm:p-9">
+        <div className="grid items-center gap-8 sm:grid-cols-[1fr_auto]">
           <div>
-            <h2 className="titular text-2xl">¿Cuál te queda más cerca?</h2>
-            <p className="mt-2 max-w-md text-sm leading-relaxed text-tinta-suave">
+            <h2 className="display text-[clamp(1.5rem,5vw,2.4rem)]">
+              ¿Cuál te queda más cerca?
+            </h2>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-cacao-suave">
               Te ordenamos las sucursales por distancia y te abrimos el WhatsApp de esa misma
               sucursal, no el de otra.
             </p>
@@ -61,7 +63,7 @@ export function ListaSucursales({ sucursales }: { sucursales: Sucursal[] }) {
               <button
                 type="button"
                 onClick={buscarCercana}
-                className="mt-4 rounded-full bg-tinta px-5 py-3 text-sm font-bold text-crema transition hover:bg-lima hover:text-tinta"
+                className="mt-5 rounded-sm bg-cacao px-6 py-3.5 text-sm font-bold text-crema transition duration-200 hover:scale-[1.04] hover:bg-lima hover:text-cacao active:scale-[0.97]"
               >
                 Usar mi ubicación
               </button>
@@ -69,7 +71,7 @@ export function ListaSucursales({ sucursales }: { sucursales: Sucursal[] }) {
 
             {estado !== "inicial" && estado !== "ubicado" && (
               <p
-                className="mt-4 text-sm font-medium text-tinta-suave"
+                className="mt-5 text-sm font-medium text-cacao-suave"
                 role="status"
                 aria-live="polite"
               >
@@ -78,10 +80,16 @@ export function ListaSucursales({ sucursales }: { sucursales: Sucursal[] }) {
             )}
 
             {estado === "ubicado" && masCercana && (
-              <p className="mt-4 text-sm font-medium" role="status" aria-live="polite">
+              <p
+                className="entra mt-5 text-sm font-medium"
+                role="status"
+                aria-live="polite"
+              >
                 La más cercana es{" "}
                 <strong className="font-bold">{masCercana.nombre}</strong>
-                {masCercana.distanciaKm !== null && `, a ${formatearDistancia(masCercana.distanciaKm)}`}.
+                {masCercana.distanciaKm !== null &&
+                  `, a ${formatearDistancia(masCercana.distanciaKm)}`}
+                .
               </p>
             )}
           </div>
@@ -92,56 +100,56 @@ export function ListaSucursales({ sucursales }: { sucursales: Sucursal[] }) {
         </div>
       </div>
 
-      <ul className="mt-8 grid gap-4 sm:grid-cols-2">
-        {ordenadas.map((sucursal) => {
-          const distancia = sucursal.distanciaKm;
-          const esLaMasCercana = sucursal.id === masCercana?.id;
+      <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+          {ordenadas.map((sucursal) => {
+            const distancia = sucursal.distanciaKm;
+            const esLaMasCercana = sucursal.id === masCercana?.id;
 
-          return (
-            <li
-              key={sucursal.id}
-              className={`flex flex-col rounded-2xl border bg-crema p-5 transition ${
-                esLaMasCercana ? "border-lima-hondo ring-2 ring-lima" : "border-borde"
-              }`}
-            >
-              {esLaMasCercana && (
-                <span className="mb-2 w-fit rounded-full bg-lima px-2.5 py-0.5 text-[0.7rem] font-bold uppercase tracking-wide text-tinta">
-                  La más cercana
-                </span>
-              )}
-
-              <h3 className="titular text-xl">{sucursal.nombre}</h3>
-              <p className="mt-1 text-sm text-tinta-suave">
-                {sucursal.direccion}
-                {distancia !== null && (
-                  <span className="font-semibold text-tinta">
-                    {" · "}
-                    {formatearDistancia(distancia)}
+            return (
+              <li
+                key={sucursal.id}
+                className={`entra flex flex-col border bg-crema p-5 transition-colors ${
+                  esLaMasCercana ? "border-lima-hondo ring-2 ring-lima" : "border-borde"
+                }`}
+              >
+                {esLaMasCercana && (
+                  <span className="mb-2 w-fit bg-lima px-2.5 py-0.5 text-[0.7rem] font-bold tracking-wide text-cacao uppercase">
+                    La más cercana
                   </span>
                 )}
-              </p>
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                <a
-                  href={linkWhatsApp(sucursal)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-full bg-lima px-4 py-2 text-sm font-bold text-tinta transition hover:bg-lima-hondo hover:text-crema"
-                >
-                  WhatsApp
-                </a>
-                <a
-                  href={posicion ? linkComoLlegar(sucursal) : linkMapa(sucursal)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-full border border-borde px-4 py-2 text-sm font-semibold transition hover:bg-crema-hondo"
-                >
-                  {posicion ? "Cómo llegar" : "Ver en el mapa"}
-                </a>
-              </div>
-            </li>
-          );
-        })}
+                <h3 className="display text-xl">{sucursal.nombre}</h3>
+                <p className="mt-1 text-sm text-cacao-suave">
+                  {sucursal.direccion}
+                  {distancia !== null && (
+                    <span className="font-semibold text-cacao">
+                      {" · "}
+                      {formatearDistancia(distancia)}
+                    </span>
+                  )}
+                </p>
+
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <a
+                    href={linkWhatsApp(sucursal)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-lima px-4 py-2.5 text-sm font-bold text-cacao transition-colors hover:bg-cacao hover:text-crema"
+                  >
+                    WhatsApp
+                  </a>
+                  <a
+                    href={posicion ? linkComoLlegar(sucursal) : linkMapa(sucursal)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="border border-cacao/25 px-4 py-2.5 text-sm font-semibold transition-colors hover:border-cacao hover:bg-cacao hover:text-crema"
+                  >
+                    {posicion ? "Cómo llegar" : "Ver en el mapa"}
+                  </a>
+                </div>
+              </li>
+            );
+          })}
       </ul>
     </>
   );

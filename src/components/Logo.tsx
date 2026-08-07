@@ -12,10 +12,10 @@ export function Logo({
 }) {
   return (
     <span
-      className={`inline-flex aspect-square items-center justify-center rounded-full bg-tinta text-crema ${className}`}
+      className={`inline-flex aspect-square items-center justify-center rounded-full bg-cacao text-crema ${className}`}
     >
       <span className="flex flex-col items-center leading-none">
-        <span className="titular text-[0.62em] tracking-tight">YNNY</span>
+        <span className="display-suelto text-[0.62em] tracking-tight">YNNY</span>
         {conBajada && (
           <span
             aria-hidden="true"

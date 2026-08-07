@@ -2,16 +2,18 @@ import type { Metadata } from "next";
 import { Archivo } from "next/font/google";
 import { Encabezado } from "@/components/Encabezado";
 import { PieDePagina } from "@/components/PieDePagina";
+import { ProveedorScroll } from "@/components/ProveedorScroll";
 import { sucursales } from "@/data/sucursales";
 import { sitio } from "@/lib/sitio";
 import "./globals.css";
 
-// Una sola familia variable: cubre desde el texto corrido hasta los titulares
-// sin sumar descargas, que es justo lo que hoy hace lento al PDF de la carta.
+// Una sola familia variable con eje de ancho: los titulares expandidos del diseño
+// salen del mismo archivo que el texto corrido, sin una descarga extra.
 const archivo = Archivo({
   subsets: ["latin"],
   display: "swap",
   variable: "--fuente-archivo",
+  axes: ["wdth"],
 });
 
 export const metadata: Metadata = {
@@ -80,9 +82,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es-AR" className={archivo.variable}>
       <body className="flex min-h-screen flex-col font-sans">
-        <Encabezado />
-        <main className="flex-1">{children}</main>
-        <PieDePagina />
+        <ProveedorScroll>
+          <Encabezado />
+          <main className="flex-1">{children}</main>
+          <PieDePagina />
+        </ProveedorScroll>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(datosEstructurados()) }}

@@ -19,29 +19,68 @@ npm run build    # build de producción
 
 | Ruta | Qué es |
 |---|---|
-| `/` | Home: propuesta, destacados con precio, mapa de sucursales |
+| `/` | Home: hero, escaparate de precios, categorías, mapa de sucursales |
 | `/carta` | 72 productos en 8 categorías, con buscador y navegación por categoría |
 | `/sucursales` | Las 10, con "cuál me queda más cerca" y WhatsApp por local |
 
 Los datos viven en dos archivos y son lo único que se toca para replicar esto en otro
 negocio: `src/data/menu.ts` y `src/data/sucursales.ts`.
 
+## Diseño
+
+Sigue una referencia de cafetería: crema y cacao, titulares anchos y pesadísimos,
+marquesinas, escaparate horizontal y filas alternadas. Dos decisiones deliberadas:
+
+- **El verde lima de YNNY se conserva como acento.** La referencia es enteramente marrón,
+  pero tirar el color de marca del cliente para copiar una maqueta sería un mal negocio.
+- **Los productos son ilustraciones SVG, no fotos.** La referencia se apoya en fotografía
+  en casi todas sus secciones y todavía no tenemos fotos de YNNY. Las ilustraciones ocupan
+  exactamente ese lugar —mismo encuadre, mismo tamaño— y se reemplazan por `<Image>` sin
+  tocar el layout. Ver `src/components/IlustracionProducto.tsx`.
+
+**No hay testimonios de clientes.** La referencia tiene una sección de reseñas; inventarlas
+sería fabricar contenido. Ese lugar lo ocupa un bloque con las sucursales y los horarios,
+que es información real.
+
+## Animación
+
+`GSAP` + `ScrollTrigger` para todo lo atado al scroll, y `Lenis` para el scroll suave,
+manejado por el mismo reloj que GSAP (ver `src/components/ProveedorScroll.tsx`).
+
+Las entradas de lo que está arriba del pliegue son **CSS puro**, no GSAP: con GSAP el
+titular quedaba invisible hasta que bajaba e hidrataba el bundle, y eso empujaba el LCP.
+Todo respeta `prefers-reduced-motion`, y hay una red de seguridad que muestra el contenido
+si GSAP no llega a correr.
+
+`motion` (framer-motion) **se quitó a propósito**: eran 50 KB de JavaScript para hovers y
+apariciones que CSS y el GSAP ya cargado resuelven igual. Ver la tabla de abajo.
+
 ## Medido, no estimado
 
-Con `npm run build` + Lighthouse mobile sobre el build de producción:
+Lighthouse mobile sobre el build de producción:
 
 | | Home | Carta | Sucursales |
 |---|---|---|---|
-| Performance | 98 | 98 | 98 |
+| Performance | 85 | 92 | 96 |
 | Accesibilidad | 100 | 100 | 100 |
 | Buenas prácticas | 100 | 100 | 100 |
 | SEO | 100\* | 100\* | 100\* |
+| CLS | 0 | 0 | 0 |
 
 \* Da 63 mientras `esDemo` esté en `true`, porque la demo se excluye a propósito de los
 buscadores. Con `esDemo: false` da 100 y sin fallas.
 
-**Peso total de la página: ~222 KB comprimidos**, contra los **4,26 MB** del PDF actual
-de la carta. Unas 19 veces más liviana, y con el texto legible por Google.
+**El costo de las animaciones, con números:**
+
+| | Antes del rediseño | Con Motion | Sin Motion (actual) |
+|---|---|---|---|
+| Performance (home) | 98 | 87 | 85 |
+| Performance (carta) | 98 | 84 | 92 |
+| JavaScript | ~150 KB | 254 KB | 204 KB |
+
+La home sigue siendo la página más pesada porque es la que más cosas anima. Si en algún
+momento pesa más el número que el efecto, lo que más recupera es sacar el parallax del
+hero y las marquesinas.
 
 ## Lo que falta antes de mostrarla
 
@@ -52,8 +91,7 @@ de la carta. Unas 19 veces más liviana, y con el texto legible por Google.
       más alto de la carta y queda raro frente a un tostado de miga a $5.400.
 - [ ] **Confirmar "Acelga y queso, brócoli"** (`menu.ts`): no se sabe si es un sabor o dos.
 - [ ] **Probarla en tu celular con datos móviles**, no en el emulador del navegador.
-- [ ] Fotos. Hoy el diseño se sostiene con tipografía a propósito, pero con fotos reales
-      de sus productos mejora bastante. Cuando cierres, pediles los originales.
+- [ ] Fotos reales. Es lo que más la mejora, y es lo primero que hay que pedir al cerrar.
 
 ## Dos cosas rotas en el Linktree actual
 

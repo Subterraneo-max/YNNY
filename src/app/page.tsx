@@ -1,126 +1,154 @@
 import Link from "next/link";
-import { categorias, formatearPrecio } from "@/data/menu";
-import { horarios, sucursales } from "@/data/sucursales";
+import { CarruselDestacados } from "@/components/CarruselDestacados";
+import { FilasCategorias } from "@/components/FilasCategorias";
+import { Hero } from "@/components/Hero";
+import { IlustracionProducto, TIPO_POR_CATEGORIA } from "@/components/IlustracionProducto";
 import { MapaSucursales } from "@/components/MapaSucursales";
+import { Marquesina } from "@/components/Marquesina";
+import { Revelar } from "@/components/Revelar";
+import { TituloRevelado } from "@/components/TituloRevelado";
+import { categorias } from "@/data/menu";
+import { horarios, sucursales } from "@/data/sucursales";
 import { sitio } from "@/lib/sitio";
 
-/** Cuatro anzuelos de la carta: barato, conocido y con el precio a la vista. */
-const destacados = [
-  { nombre: "Infusión + 2 facturas", precio: 4500, categoria: "Desayunos" },
-  { nombre: "Submarino + 2 medialunas", precio: 4800, categoria: "Meriendas" },
-  { nombre: "Empanadas", precio: 2400, categoria: "Todas las variedades" },
-  { nombre: "Almuerzo del día", precio: 11500, categoria: "Con bebida y postre" },
-];
+const nombresCategorias = categorias.map((categoria) => categoria.nombre.toUpperCase());
 
 export default function Inicio() {
   return (
     <>
-      <section className="border-b border-borde bg-crema-hondo">
-        <div className="mx-auto max-w-5xl px-4 py-16 sm:py-24">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-lima-hondo">
-            Panadería &amp; café · {sitio.ciudad}
-          </p>
-          <h1 className="titular mt-4 text-5xl sm:text-7xl">
-            Todo recién hecho,
-            <br />
-            <span className="text-lima-hondo">todos los días.</span>
-          </h1>
-          <p className="mt-6 max-w-lg text-lg leading-relaxed text-tinta-suave">
-            Desayunos, meriendas y almuerzos en {sucursales.length} sucursales de {sitio.ciudad}.
-            Panadería, pastelería y sándwiches para llevar o comer acá.
-          </p>
+      <Hero />
 
-          <div className="mt-8 flex flex-wrap gap-3">
+      <Marquesina textos={nombresCategorias} velocidad={30} />
+
+      {/* ---------- Escaparate ---------- */}
+      <section className="py-20 sm:py-28">
+        <div className="mx-auto mb-4 max-w-6xl px-4">
+          <TituloRevelado
+            texto="Nuestra carta"
+            como="h2"
+            className="display text-[clamp(2.2rem,8vw,5rem)]"
+          />
+          <Revelar retraso={0.15}>
+            <p className="mt-4 max-w-md leading-relaxed text-cacao-suave">
+              Lo más barato de cada categoría, para que veas por dónde arranca. Después está
+              la carta entera.
+            </p>
+          </Revelar>
+        </div>
+
+        <CarruselDestacados />
+
+        <div className="mx-auto mt-8 max-w-6xl px-4">
+          <Revelar>
             <Link
               href="/carta"
-              className="rounded-full bg-tinta px-6 py-3.5 font-bold text-crema transition hover:bg-lima hover:text-tinta"
+              className="group inline-flex items-center gap-3 border-b-2 border-cacao pb-1 text-lg font-bold"
             >
-              Ver la carta
+              Ver la carta completa
+              <span
+                aria-hidden="true"
+                className="transition-transform duration-300 group-hover:translate-x-1.5"
+              >
+                →
+              </span>
             </Link>
-            <Link
-              href="/sucursales"
-              className="rounded-full border border-tinta px-6 py-3.5 font-bold transition hover:bg-crema"
-            >
-              Sucursal más cercana
-            </Link>
-          </div>
+          </Revelar>
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-16">
-        <h2 className="titular text-3xl">Para arrancar el día</h2>
-        <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {destacados.map((item) => (
-            <li
-              key={item.nombre}
-              className="flex flex-col justify-between rounded-2xl border border-borde p-5"
-            >
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-lima-hondo">
-                  {item.categoria}
-                </p>
-                <p className="mt-1.5 font-semibold leading-snug">{item.nombre}</p>
-              </div>
-              <p className="titular mt-6 text-2xl tabular-nums">
-                {formatearPrecio(item.precio)}
-              </p>
-            </li>
-          ))}
-        </ul>
-        <Link
-          href="/carta"
-          className="mt-6 inline-block font-bold underline underline-offset-4 hover:text-lima-hondo"
-        >
-          Ver la carta completa →
-        </Link>
+      {/* ---------- Categorías ---------- */}
+      <section className="bg-crema-hondo py-20 sm:py-28">
+        <div className="mx-auto mb-10 max-w-6xl px-4">
+          <TituloRevelado
+            texto="Qué vas a encontrar"
+            como="h2"
+            className="display text-[clamp(2.2rem,8vw,5rem)]"
+          />
+        </div>
+        <FilasCategorias />
       </section>
 
-      <section className="border-y border-borde bg-crema-hondo">
-        <div className="mx-auto grid max-w-5xl items-center gap-10 px-4 py-16 sm:grid-cols-2">
-          <div>
-            <h2 className="titular text-3xl">{sucursales.length} sucursales en {sitio.ciudad}</h2>
-            <p className="mt-4 leading-relaxed text-tinta-suave">
-              Cada local tiene su propio WhatsApp. Te decimos cuál te queda más cerca y te
-              abrimos el chat de ese local, no el de otro.
-            </p>
+      <Marquesina textos={["TODO RECIÉN HECHO", "TODOS LOS DÍAS", `${sucursales.length} SUCURSALES`]} velocidad={24} />
 
-            <dl className="mt-6 space-y-1.5 text-sm">
-              {horarios.map((horario) => (
-                <div key={horario.dias} className="flex flex-wrap gap-x-2">
-                  <dt className="font-semibold">{horario.dias}:</dt>
-                  <dd className="text-tinta-suave">{horario.franja}</dd>
+      {/* ---------- Sucursales ----------
+          En la referencia acá van reseñas de clientes. No inventamos testimonios:
+          este bloque muestra información real y cumple el mismo rol visual. */}
+      <section className="py-20 sm:py-28">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 lg:grid-cols-2">
+          <div>
+            <TituloRevelado
+              texto={`${sucursales.length} sucursales en ${sitio.ciudad}`}
+              como="h2"
+              className="display text-[clamp(2rem,7vw,4.2rem)]"
+            />
+            <Revelar retraso={0.15}>
+              <p className="mt-5 max-w-md leading-relaxed text-cacao-suave">
+                Cada local tiene su propio WhatsApp. Te decimos cuál te queda más cerca y te
+                abrimos el chat de esa sucursal, no el de otra.
+              </p>
+
+              <dl className="mt-7 space-y-2">
+                {horarios.map((horario) => (
+                  <div key={horario.dias} className="flex flex-wrap items-baseline gap-x-3 border-b border-borde pb-2">
+                    <dt className="font-semibold">{horario.dias}</dt>
+                    <dd className="display ml-auto text-xl tabular-nums">{horario.franja}</dd>
+                  </div>
+                ))}
+              </dl>
+
+              <Link
+                href="/sucursales"
+                className="mt-8 inline-block rounded-sm bg-cacao px-7 py-4 font-bold text-crema transition-colors hover:bg-lima hover:text-cacao"
+              >
+                Ver todas las sucursales
+              </Link>
+            </Revelar>
+          </div>
+
+          <Revelar desde="escala" className="mx-auto w-full max-w-sm">
+            <MapaSucursales sucursales={sucursales} />
+          </Revelar>
+        </div>
+      </section>
+
+      {/* ---------- Cierre ---------- */}
+      <section className="px-4 pb-24">
+        <div className="mx-auto max-w-6xl bg-crema-hondo">
+          <div className="grid items-center gap-10 p-8 sm:p-12 lg:grid-cols-2">
+            <div>
+              <TituloRevelado
+                texto="Tu próximo desayuno está a un mensaje"
+                como="h2"
+                className="display text-[clamp(1.9rem,6vw,3.6rem)]"
+              />
+              <Revelar retraso={0.15}>
+                <p className="mt-5 max-w-sm leading-relaxed text-cacao-suave">
+                  Escribinos por WhatsApp a la sucursal que te quede más cerca y te lo
+                  preparamos.
+                </p>
+                <Link
+                  href="/sucursales"
+                  className="mt-7 inline-block rounded-sm bg-lima px-7 py-4 font-bold text-cacao transition-colors hover:bg-cacao hover:text-crema"
+                >
+                  Elegir sucursal
+                </Link>
+              </Revelar>
+            </div>
+
+            {/* Mosaico, en el lugar de la grilla de fotos de la referencia */}
+            <Revelar escalonar className="grid grid-cols-3 gap-2 sm:gap-3">
+              {categorias.slice(0, 6).map((categoria) => (
+                <div key={categoria.slug} className="aspect-square bg-crema p-2">
+                  <IlustracionProducto
+                    tipo={TIPO_POR_CATEGORIA[categoria.slug] ?? "plato"}
+                    nombre={categoria.nombre}
+                    className="size-full"
+                  />
                 </div>
               ))}
-            </dl>
-
-            <Link
-              href="/sucursales"
-              className="mt-7 inline-block rounded-full bg-lima px-6 py-3.5 font-bold text-tinta transition hover:bg-lima-hondo hover:text-crema"
-            >
-              Ver las sucursales
-            </Link>
-          </div>
-
-          <div className="w-full max-w-xs justify-self-center">
-            <MapaSucursales sucursales={sucursales} />
+            </Revelar>
           </div>
         </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 py-16">
-        <h2 className="titular text-3xl">Qué vas a encontrar</h2>
-        <ul className="mt-6 flex flex-wrap gap-2.5">
-          {categorias.map((categoria) => (
-            <li key={categoria.slug}>
-              <Link
-                href={`/carta#${categoria.slug}`}
-                className="inline-block rounded-full border border-borde px-4 py-2.5 font-semibold transition hover:border-lima-hondo hover:bg-lima/20"
-              >
-                {categoria.nombre}
-              </Link>
-            </li>
-          ))}
-        </ul>
       </section>
     </>
   );

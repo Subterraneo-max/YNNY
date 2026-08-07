@@ -1,48 +1,131 @@
 @import "tailwindcss";
 
 /*
-  Paleta tomada de la identidad que YNNY ya usa: el negro del logo, el verde lima
-  de los botones del Linktree y el celeste de su fondo. El crema es el respiro
-  cálido que le falta a esa combinación cuando se la lleva a una página entera.
+  Paleta crema y cacao, tomada de la referencia de diseño. El lima de YNNY se
+  conserva como acento: la referencia es enteramente marrón, pero tirar el color
+  de marca del cliente para copiar una maqueta sería un mal negocio.
+
+  Los dos verdes cumplen 4,5:1 sobre los dos cremas; están medidos, no elegidos a ojo.
 */
 @theme {
-  --color-tinta: #14140f;
-  --color-tinta-suave: #55554a;
-  --color-crema: #faf6ec;
-  --color-crema-hondo: #f1ead9;
+  --color-crema: #f0eae0;
+  --color-crema-hondo: #e5dccd;
+  --color-cacao: #35291f;
+  --color-cacao-medio: #4a3a2c;
+  --color-cacao-suave: #6b5a4a;
   --color-lima: #a8c41e;
-  /* El lima de la marca sirve como fondo, pero como texto daba 3,2:1 y el mínimo
-     legible es 4,5:1. Este verde llega a 4,9:1 sobre el crema hondo y a 5,5:1 sobre
-     el crema claro, que son los dos fondos donde se lo usa. */
-  --color-lima-hondo: #5c6b08;
-  --color-celeste: #45b6d4;
-  --color-borde: #e2d9c3;
+  --color-lima-hondo: #556308;
+  --color-borde: #d6cab5;
 
   --font-sans: var(--fuente-archivo), ui-sans-serif, system-ui, sans-serif;
+
+  --animate-marquesina: marquesina 32s linear infinite;
+
+  @keyframes marquesina {
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }
 
 html {
-  scroll-behavior: smooth;
-  /* El nav de categorías queda fijo: sin esto, los anclajes caen debajo. */
-  scroll-padding-top: 7.5rem;
+  /* Lenis maneja el scroll; el smooth nativo pelearía contra él. */
+  scroll-behavior: auto;
 }
 
 body {
   background-color: var(--color-crema);
-  color: var(--color-tinta);
+  color: var(--color-cacao);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+/*
+  Display ancho y pesadísimo, que es lo que le da el golpe a la referencia.
+  El eje de ancho viene del archivo variable de Archivo, así que no cuesta
+  una descarga extra.
+*/
+.display {
+  font-weight: 800;
+  font-stretch: 125%;
+  letter-spacing: -0.02em;
+  line-height: 0.86;
+  text-transform: uppercase;
+  text-wrap: balance;
 }
 
-/* Tipografía de titulares: apretada y pesada, como el logotipo. */
-.titular {
+.display-suelto {
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 0.95;
   text-wrap: balance;
+}
+
+/* Cada carácter del titular entra por separado; el span necesita ser bloque. */
+.letra {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+/*
+  Entradas de lo que está arriba del pliegue: CSS puro, sin JS.
+
+  Con GSAP, el titular queda invisible hasta que el bundle baja, hidrata y corre
+  el tween. En un celular con red lenta eso empujaba el Largest Contentful Paint
+  a 3,5 s. Una animación CSS arranca en el primer frame pintado, así que el texto
+  aparece a la vez que el resto de la página y el efecto se ve igual.
+*/
+.entra {
+  animation: entra-suave 0.65s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--d, 0) * 1ms);
+}
+
+@keyframes entra-suave {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+/*
+  El reveal de letras NO toca la opacidad: sube cada letra desde debajo del
+  overflow-hidden de su palabra. Con `opacity: 0` el navegador considera que el
+  titular todavía no se pintó, y como es el elemento más grande de la página, el
+  Largest Contentful Paint se iba a 3,5 s esperando a que terminara el escalonado.
+  Moviendo solo el transform, el texto cuenta como pintado desde el primer frame.
+*/
+.entra-letras .letra {
+  animation: entra-letra 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 16ms);
+}
+
+@keyframes entra-letra {
+  from {
+    transform: translateY(110%);
+  }
+}
+
+/* Estado inicial de lo que revela el scroll más abajo. Si GSAP no llega a correr
+   (JS lento, error, bot), un fallback lo devuelve a visible. */
+[data-revelar] {
+  opacity: 0;
+}
+
+.js-sin-animacion [data-revelar],
+.js-sin-animacion .letra {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-revelar],
+  .letra {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .entra,
+  .entra-letras .letra {
+    animation: none;
+  }
 }

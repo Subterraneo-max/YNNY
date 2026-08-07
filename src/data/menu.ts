@@ -376,3 +376,22 @@ export const todosLosProductos = categorias.flatMap((categoria) =>
 
 export const formatearPrecio = (precio: number) =>
   "$" + precio.toLocaleString("es-AR");
+
+/**
+ * Selección para el carrusel de la home: un producto por categoría, eligiendo el
+ * más barato de cada una para que el escaparate arranque por el precio de entrada.
+ * Los precios salen de `categorias`, nunca se escriben dos veces.
+ */
+export const destacados = categorias.map((categoria) => {
+  const productos = categoria.grupos.flatMap((grupo) => grupo.productos);
+  const masBarato = productos.reduce((menor, actual) =>
+    (actual.precio ?? Infinity) < (menor.precio ?? Infinity) ? actual : menor,
+  );
+
+  return {
+    ...masBarato,
+    categoriaSlug: categoria.slug,
+    categoriaNombre: categoria.nombre,
+    cuantosHay: productos.length,
+  };
+});

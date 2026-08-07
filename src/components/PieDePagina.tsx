@@ -1,68 +1,98 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { categorias } from "@/data/menu";
 import { horarios, sucursales } from "@/data/sucursales";
 import { sitio } from "@/lib/sitio";
 
 export function PieDePagina() {
   return (
-    <footer className="mt-24 border-t border-borde bg-crema-hondo">
-      <div className="mx-auto grid max-w-5xl gap-10 px-4 py-14 sm:grid-cols-3">
+    <footer className="bg-cacao text-crema">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <Logo className="w-14 text-[2rem]" />
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-tinta-suave">
-            Todo recién hecho, todos los días. {sucursales.length} sucursales en {sitio.ciudad}.
+          <Logo className="w-16 text-[2.3rem]" />
+          <p className="mt-5 max-w-xs text-sm leading-relaxed text-crema/60">
+            Panadería y café en {sitio.ciudad}. Todo recién hecho, todos los días.
           </p>
+          <a
+            href={sitio.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-5 inline-block text-sm font-semibold text-lima underline-offset-4 hover:underline"
+          >
+            @ynnycafe
+          </a>
         </div>
 
         <div>
-          <h2 className="text-xs font-bold uppercase tracking-widest text-tinta-suave">Horarios</h2>
-          <ul className="mt-4 space-y-2 text-sm">
+          <h2 className="text-[0.7rem] font-bold tracking-[0.18em] text-crema/70 uppercase">
+            Horarios
+          </h2>
+          <dl className="mt-5 space-y-4">
             {horarios.map((horario) => (
-              <li key={horario.dias}>
-                <span className="block font-semibold">{horario.dias}</span>
-                <span className="text-tinta-suave">{horario.franja}</span>
+              <div key={horario.dias}>
+                <dt className="display-suelto text-xl leading-tight">{horario.dias}</dt>
+                <dd className="mt-1 text-sm text-crema/60 tabular-nums">{horario.franja}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <div>
+          <h2 className="text-[0.7rem] font-bold tracking-[0.18em] text-crema/70 uppercase">
+            Carta
+          </h2>
+          <ul className="mt-5 space-y-2 text-sm">
+            {categorias.map((categoria) => (
+              <li key={categoria.slug}>
+                <Link
+                  href={`/carta#${categoria.slug}`}
+                  className="text-crema/75 underline-offset-4 transition-colors hover:text-lima hover:underline"
+                >
+                  {categoria.nombre}
+                </Link>
               </li>
             ))}
           </ul>
         </div>
 
         <div>
-          <h2 className="text-xs font-bold uppercase tracking-widest text-tinta-suave">Secciones</h2>
-          <ul className="mt-4 space-y-2 text-sm">
+          <h2 className="text-[0.7rem] font-bold tracking-[0.18em] text-crema/70 uppercase">
+            Sucursales
+          </h2>
+          <ul className="mt-5 space-y-2 text-sm">
+            {sucursales.slice(0, 6).map((sucursal) => (
+              <li key={sucursal.id} className="text-crema/75">
+                {sucursal.nombre}
+              </li>
+            ))}
             <li>
-              <Link href="/carta" className="font-semibold underline-offset-4 hover:underline">
-                Carta
-              </Link>
-            </li>
-            <li>
-              <Link href="/sucursales" className="font-semibold underline-offset-4 hover:underline">
-                Sucursales y WhatsApp
-              </Link>
-            </li>
-            <li>
-              <a
-                href={sitio.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold underline-offset-4 hover:underline"
+              <Link
+                href="/sucursales"
+                className="font-semibold text-lima underline-offset-4 hover:underline"
               >
-                Instagram
-              </a>
+                Ver las {sucursales.length} →
+              </Link>
             </li>
           </ul>
         </div>
       </div>
 
-      {sitio.esDemo && (
-        <div className="border-t border-borde px-4 py-5">
-          <p className="mx-auto max-w-5xl text-xs leading-relaxed text-tinta-suave">
-            Sitio de demostración sin fines comerciales, realizado por {sitio.autorDemo} como
-            propuesta para {sitio.nombre}. No está afiliado a la empresa ni la representa. Los
-            precios y la información provienen de material público publicado por el propio
-            negocio y pueden estar desactualizados.
-          </p>
+      <div className="border-t border-crema/15">
+        <div className="mx-auto max-w-6xl px-4 py-6">
+          {sitio.esDemo ? (
+            <p className="text-xs leading-relaxed text-crema/65">
+              Sitio de demostración sin fines comerciales, realizado por {sitio.autorDemo} como
+              propuesta para {sitio.nombre}. No está afiliado a la empresa ni la representa.
+              Los precios y la información provienen de material público publicado por el
+              propio negocio y pueden estar desactualizados.
+            </p>
+          ) : (
+            <p className="text-xs text-crema/65">
+              © {new Date().getFullYear()} {sitio.nombre}
+            </p>
+          )}
         </div>
-      )}
+      </div>
     </footer>
   );
 }
