@@ -105,12 +105,16 @@ Son verificables tocando los botones desde un celular y están anotadas en
 
 ## Deploy
 
-```bash
-npx vercel        # primera vez
-npx vercel --prod
-```
+**En vivo: https://ynny-omega.vercel.app**
 
-Antes de pasar a producción, en `src/lib/sitio.ts`: poner el dominio real en `url` y
-`esDemo` en `false`. **El dominio y el hosting los paga y los registra el cliente, a su
-nombre** — que se les venciera `ynny.com.ar` es justamente el problema que vinimos a
-resolver.
+El proyecto `ynny` de Vercel está conectado a este repositorio, así que **cada push a
+`main` redeploya solo**. No hace falta correr nada a mano.
+
+Hay un segundo proyecto, `ynny-demo` (https://ynny-demo.vercel.app), creado desde la CLI
+antes de darnos cuenta de que el primero ya existía. Está de más y conviene borrarlo desde
+el panel de Vercel para no terminar mostrando una versión vieja por error.
+
+Antes de pasar a producción de verdad, en `src/lib/sitio.ts`: poner el dominio definitivo
+en `url` y `esDemo` en `false`. **El dominio y el hosting los paga y los registra el
+cliente, a su nombre** — que se les venciera `ynny.com.ar` es justamente el problema que
+vinimos a resolver.
