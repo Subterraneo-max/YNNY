@@ -1,13 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { BuscadorHero } from "@/components/BuscadorHero";
-import { IlustracionProducto } from "@/components/IlustracionProducto";
 import { TextoEnLetras } from "@/components/TextoEnLetras";
 import { gsap, registrarGsap, prefiereMenosMovimiento } from "@/lib/animaciones";
 import { sucursales } from "@/data/sucursales";
 import { todosLosProductos } from "@/data/menu";
 import { sitio } from "@/lib/sitio";
+import fotoClose from "@/imagenes/cafe-pasteleria-close.jpg";
+import fotoCozy from "@/imagenes/cafe-pasteleria-cozy.jpg";
 
 /**
  * La entrada del hero es CSS (clases `entra` y `entra-letras`): pinta en el
@@ -34,12 +36,12 @@ export function Hero() {
       } as const;
 
       gsap.to("[data-hero='ilustracion-izq']", {
-        yPercent: -34,
+        yPercent: -30,
         ease: "none",
         scrollTrigger: parallax,
       });
       gsap.to("[data-hero='ilustracion-der']", {
-        yPercent: 26,
+        yPercent: 22,
         ease: "none",
         scrollTrigger: parallax,
       });
@@ -57,37 +59,6 @@ export function Hero() {
   return (
     <section ref={raiz} className="relative overflow-hidden px-4 pt-28 pb-16 sm:pt-36 sm:pb-24">
       <div className="relative mx-auto max-w-6xl">
-        {/*
-          Las ilustraciones abrazan el titular como las fotos de la referencia.
-          En celular quedan chicas y arrinconadas: a tamaño completo se comen las
-          letras y el titular deja de leerse, que es lo único que no puede pasar.
-        */}
-        <div
-          className="entra pointer-events-none absolute -top-4 -left-6 z-0 w-20 sm:top-10 sm:left-0 sm:w-48 lg:w-60"
-          style={{ "--d": 140 } as React.CSSProperties}
-        >
-          <div data-hero="ilustracion-izq">
-            <IlustracionProducto
-              tipo="factura"
-              nombre="medialunas recién horneadas"
-              className="w-full drop-shadow-2xl"
-            />
-          </div>
-        </div>
-
-        <div
-          className="entra pointer-events-none absolute -right-6 bottom-0 z-0 w-20 sm:top-28 sm:right-0 sm:bottom-auto sm:w-52 lg:w-64"
-          style={{ "--d": 240 } as React.CSSProperties}
-        >
-          <div data-hero="ilustracion-der">
-            <IlustracionProducto
-              tipo="infusion"
-              nombre="café recién hecho"
-              className="w-full drop-shadow-2xl"
-            />
-          </div>
-        </div>
-
         <div data-hero="titulo" className="relative z-10 text-center">
           <h1
             aria-label="Todo recién hecho, todos los días"
@@ -100,6 +71,53 @@ export function Hero() {
               <TextoEnLetras texto="TODOS LOS DÍAS" />
             </span>
           </h1>
+        </div>
+
+        {/*
+          Las dos fotos cambian de rol según el ancho.
+
+          En pantalla grande van flotando a los costados del titular, saliéndose
+          por el borde, como en la referencia. En celular eso no funciona: a
+          cualquier tamaño legible tapan las letras o se comen los números de
+          abajo. Ahí pasan a ser un par en el flujo, debajo del titular, donde se
+          ven grandes y no pisan nada.
+
+          El `sm:contents` es lo que permite las dos cosas con un solo marcado:
+          en pantalla grande el contenedor deja de generar caja y las fotos se
+          posicionan contra la sección, no contra él.
+        */}
+        <div className="mt-8 flex justify-center gap-3 sm:contents">
+          <div
+            className="entra pointer-events-none w-[43%] sm:absolute sm:top-10 sm:-left-2 sm:z-0 sm:w-48 lg:w-60"
+            style={{ "--d": 140 } as React.CSSProperties}
+          >
+            <div data-hero="ilustracion-izq" className="foto-hero">
+              <Image
+                src={fotoCozy}
+                alt="Cappuccino con espuma dibujada y una medialuna, sobre la barra de madera de un café"
+                placeholder="blur"
+                priority
+                sizes="(min-width: 1024px) 240px, (min-width: 640px) 192px, 43vw"
+                className="h-full w-full object-cover"
+              />
+            </div>
+          </div>
+
+          <div
+            className="entra pointer-events-none w-[43%] sm:absolute sm:top-28 sm:-right-2 sm:z-0 sm:w-52 lg:w-64"
+            style={{ "--d": 240 } as React.CSSProperties}
+          >
+            <div data-hero="ilustracion-der" className="foto-hero">
+              <Image
+                src={fotoClose}
+                alt="Medialuna recién horneada y un café con leche servidos en platos blancos"
+                placeholder="blur"
+                priority
+                sizes="(min-width: 1024px) 256px, (min-width: 640px) 208px, 43vw"
+                className="h-full w-full object-cover"
+              />
+            </div>
+          </div>
         </div>
 
         <div className="relative z-10 mt-10 flex flex-col items-center gap-7">

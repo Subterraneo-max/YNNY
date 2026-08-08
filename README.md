@@ -33,10 +33,21 @@ marquesinas, escaparate horizontal y filas alternadas. Dos decisiones deliberada
 
 - **El verde lima de YNNY se conserva como acento.** La referencia es enteramente marrón,
   pero tirar el color de marca del cliente para copiar una maqueta sería un mal negocio.
-- **Los productos son ilustraciones SVG, no fotos.** La referencia se apoya en fotografía
-  en casi todas sus secciones y todavía no tenemos fotos de YNNY. Las ilustraciones ocupan
-  exactamente ese lugar —mismo encuadre, mismo tamaño— y se reemplazan por `<Image>` sin
-  tocar el layout. Ver `src/components/IlustracionProducto.tsx`.
+- **El hero lleva dos fotos reales; el resto son ilustraciones SVG.** Las dos fotos
+  (`src/imagenes/`) salen de Unsplash, cuya licencia permite uso comercial sin atribución.
+  Las ilustraciones de las demás secciones (`src/components/IlustracionProducto.tsx`)
+  ocupan exactamente el lugar de una foto y se reemplazan por `<Image>` sin tocar el
+  layout.
+
+  **Las fotos del hero son de un café genérico, no de YNNY.** Sirven para que la demo se
+  vea terminada, pero un dueño rosarino nota que ese croissant no es una medialuna. Antes
+  de mostrarla conviene cambiarlas por dos fotos de ellos: son dos archivos en
+  `src/imagenes/` con el mismo nombre y listo.
+
+- **El hero cambia de composición según el ancho.** En pantalla grande las fotos flotan a
+  los costados del titular saliéndose por el borde, como en la referencia. En celular eso
+  tapaba las letras y los números, así que ahí pasan a ser un par en el flujo debajo del
+  titular. Un solo marcado hace las dos cosas, con `sm:contents`.
 
 **No hay testimonios de clientes.** La referencia tiene una sección de reseñas; inventarlas
 sería fabricar contenido. Ese lugar lo ocupa un bloque con las sucursales y los horarios,
@@ -61,7 +72,7 @@ Lighthouse mobile sobre el build de producción:
 
 | | Home | Carta | Sucursales |
 |---|---|---|---|
-| Performance | 85 | 92 | 96 |
+| Performance | 89 | 92 | 96 |
 | Accesibilidad | 100 | 100 | 100 |
 | Buenas prácticas | 100 | 100 | 100 |
 | SEO | 100\* | 100\* | 100\* |
@@ -74,7 +85,7 @@ buscadores. Con `esDemo: false` da 100 y sin fallas.
 
 | | Antes del rediseño | Con Motion | Sin Motion (actual) |
 |---|---|---|---|
-| Performance (home) | 98 | 87 | 85 |
+| Performance (home) | 98 | 87 | 89 |
 | Performance (carta) | 98 | 84 | 92 |
 | JavaScript | ~150 KB | 254 KB | 204 KB |
 

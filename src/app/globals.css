@@ -105,6 +105,26 @@ body {
   }
 }
 
+/*
+  Las fotos del hero: proporción fija 3:4 para que las dos ocupen exactamente el
+  mismo bloque y la composición no se desarme entre tamaños de pantalla, esquinas
+  suaves y una sombra en tono cacao —no negra— para que se apoyen sobre el crema
+  sin ensuciarlo.
+*/
+.foto-hero {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 1rem;
+  box-shadow: 0 18px 44px -14px rgb(53 41 31 / 0.4);
+}
+
+@media (min-width: 640px) {
+  .foto-hero {
+    border-radius: 1.5rem;
+    box-shadow: 0 30px 70px -20px rgb(53 41 31 / 0.45);
+  }
+}
+
 /* Estado inicial de lo que revela el scroll más abajo. Si GSAP no llega a correr
    (JS lento, error, bot), un fallback lo devuelve a visible. */
 [data-revelar] {
