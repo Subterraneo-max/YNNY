@@ -108,9 +108,42 @@ export const sucursales: Sucursal[] = [
   },
 ];
 
-export const horarios = [
-  { dias: "Lunes a sábados", franja: "7:00 a 21:00" },
-  { dias: "Domingos y feriados", franja: "7:30 a 21:00" },
+export type Horario = {
+  /** Cómo se muestra en pantalla. */
+  dias: string;
+  franja: string;
+  /** Días que cubre, con 0 = domingo (igual que Date.getDay()). */
+  diasSemana: number[];
+  /** En formato 24 h, para poder comparar contra la hora actual. */
+  abre: string;
+  cierra: string;
+};
+
+/**
+ * Horarios tal como los publica YNNY en su bio de Instagram. Los campos de texto
+ * y los numéricos dicen exactamente lo mismo: los primeros son para mostrar y los
+ * segundos para calcular si está abierto.
+ *
+ * Ojo con "feriados": no hay calendario de feriados cargado, así que un feriado
+ * que caiga entre semana se va a calcular con el horario de lunes a sábados. Para
+ * resolverlo bien haría falta la lista de feriados argentinos, que se agrega
+ * cuando el cliente confirme si abren distinto esos días.
+ */
+export const horarios: Horario[] = [
+  {
+    dias: "Lunes a sábados",
+    franja: "7:00 a 21:00",
+    diasSemana: [1, 2, 3, 4, 5, 6],
+    abre: "07:00",
+    cierra: "21:00",
+  },
+  {
+    dias: "Domingos y feriados",
+    franja: "7:30 a 21:00",
+    diasSemana: [0],
+    abre: "07:30",
+    cierra: "21:00",
+  },
 ];
 
 /**

@@ -102,19 +102,24 @@ export function CartaNavegable() {
           value={busqueda}
           onChange={(evento) => setEscrito(evento.target.value)}
           placeholder="Buscar: medialunas, palta, empanadas…"
-          className="w-full border border-cacao/25 bg-transparent px-4 py-3 text-sm outline-none transition placeholder:text-cacao-suave/70 focus:border-cacao"
+          // Texto de 16 px y alto cómodo: esta página se usa desde un QR en la
+          // mesa, y por debajo de 16 px iOS hace zoom solo al tocar el campo.
+          className="w-full rounded-sm border border-cacao/25 bg-crema px-4 py-3.5 text-base outline-none transition placeholder:text-cacao-suave/70 focus:border-cacao focus:ring-2 focus:ring-lima"
         />
 
         {!resultados && (
           <nav
             aria-label="Categorías de la carta"
-            className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="mt-3 flex snap-x gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {categorias.map((categoria) => (
               <a
                 key={categoria.slug}
                 href={`#${categoria.slug}`}
-                className="shrink-0 border border-cacao/25 px-3.5 py-1.5 text-sm font-semibold transition hover:border-cacao hover:bg-cacao hover:text-crema"
+                // min-h-11 son los 44 px que recomienda Apple como área mínima
+                // de toque: con el dedo y el celular apoyado en la mesa, los
+                // chips finos de antes se erraban seguido.
+                className="flex min-h-11 shrink-0 snap-start items-center rounded-sm border border-cacao/25 px-4 text-sm font-semibold transition hover:border-cacao hover:bg-cacao hover:text-crema"
               >
                 {categoria.nombre}
               </a>
@@ -159,7 +164,7 @@ export function CartaNavegable() {
         ) : (
           <div>
             {categorias.map((categoria) => (
-              <section key={categoria.slug} id={categoria.slug} className="mt-16 scroll-mt-44">
+              <section key={categoria.slug} id={categoria.slug} className="mt-16 scroll-mt-52">
                 <div
                   className="flex items-end gap-4 border-b-2 border-cacao pb-3"
                 >

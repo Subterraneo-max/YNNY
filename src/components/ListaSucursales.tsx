@@ -1,22 +1,51 @@
 "use client";
 
 import { useState } from "react";
+import { EstadoSucursal } from "@/components/EstadoSucursal";
 import { MapaSucursales } from "@/components/MapaSucursales";
 import type { Sucursal } from "@/data/sucursales";
 import { formatearDistancia, ordenarPorCercania } from "@/lib/distancia";
-import { linkComoLlegar, linkMapa, linkWhatsApp } from "@/lib/enlaces";
+import { linkComoLlegar, linkWhatsApp } from "@/lib/enlaces";
 
 type Estado = "inicial" | "buscando" | "ubicado" | "sin-permiso" | "error";
 
 const MENSAJES: Record<Exclude<Estado, "inicial" | "ubicado">, string> = {
   buscando: "Buscando tu ubicación…",
   "sin-permiso":
-    "No nos diste permiso para usar tu ubicación. No hay problema: abajo están las 10 sucursales.",
-  error: "No pudimos obtener tu ubicación. Abajo están las 10 sucursales.",
+    "No nos diste permiso para usar tu ubicación. Abajo están todas las sucursales.",
+  error: "No pudimos obtener tu ubicación. Abajo están todas las sucursales.",
 };
 
 /** `distanciaKm` en null significa que todavía no sabemos dónde está la persona. */
 type SucursalConDistancia = Sucursal & { distanciaKm: number | null };
+
+function BotonesSucursal({ sucursal }: { sucursal: Sucursal }) {
+  return (
+    <div className="mt-5 flex flex-wrap gap-2">
+      <a
+        href={linkWhatsApp(sucursal)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="rounded-sm bg-lima px-4 py-3 text-sm font-bold text-cacao transition-colors hover:bg-cacao hover:text-crema"
+      >
+        WhatsApp
+      </a>
+      {/*
+        Va siempre, con o sin permiso de ubicación: el link lleva las coordenadas
+        del local como destino y Maps resuelve el origen solo. En el celular abre
+        la app de Maps; en la computadora, el sitio.
+      */}
+      <a
+        href={linkComoLlegar(sucursal)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="rounded-sm border border-cacao/25 px-4 py-3 text-sm font-semibold transition-colors hover:border-cacao hover:bg-cacao hover:text-crema"
+      >
+        Cómo llegar
+      </a>
+    </div>
+  );
+}
 
 export function ListaSucursales({ sucursales }: { sucursales: Sucursal[] }) {
   const [estado, setEstado] = useState<Estado>("inicial");
@@ -27,6 +56,8 @@ export function ListaSucursales({ sucursales }: { sucursales: Sucursal[] }) {
     : sucursales.map((sucursal) => ({ ...sucursal, distanciaKm: null }));
 
   const masCercana = posicion ? ordenadas[0] : undefined;
+  // La destacada ya se muestra arriba en grande, así que no se repite en la grilla.
+  const resto = masCercana ? ordenadas.slice(1) : ordenadas;
 
   function buscarCercana() {
     if (!("geolocation" in navigator)) {
@@ -40,6 +71,7 @@ export function ListaSucursales({ sucursales }: { sucursales: Sucursal[] }) {
         setEstado("ubicado");
       },
       (error) => {
+        // Si se niega el permiso no pasa nada: la lista completa sigue abajo.
         setEstado(error.code === error.PERMISSION_DENIED ? "sin-permiso" : "error");
       },
       { enableHighAccuracy: true, timeout: 10_000, maximumAge: 300_000 },
@@ -77,20 +109,6 @@ export function ListaSucursales({ sucursales }: { sucursales: Sucursal[] }) {
                 {MENSAJES[estado]}
               </p>
             )}
-
-            {estado === "ubicado" && masCercana && (
-              <p
-                className="entra mt-5 text-sm font-medium"
-                role="status"
-                aria-live="polite"
-              >
-                La más cercana es{" "}
-                <strong className="font-bold">{masCercana.nombre}</strong>
-                {masCercana.distanciaKm !== null &&
-                  `, a ${formatearDistancia(masCercana.distanciaKm)}`}
-                .
-              </p>
-            )}
           </div>
 
           <div className="w-full max-w-[15rem] justify-self-center sm:justify-self-end">
@@ -99,56 +117,48 @@ export function ListaSucursales({ sucursales }: { sucursales: Sucursal[] }) {
         </div>
       </div>
 
+      {/* La más cercana, en grande y con las dos acciones a mano. */}
+      {masCercana && (
+        <div
+          className="entra mt-6 border-2 border-lima-hondo bg-crema p-6 sm:p-8"
+          role="status"
+          aria-live="polite"
+        >
+          <span className="mb-3 inline-block bg-lima px-3 py-1 text-[0.7rem] font-bold tracking-wide text-cacao uppercase">
+            Tu YNNY más cercano
+          </span>
+          <h3 className="display text-[clamp(1.6rem,6vw,2.6rem)]">{masCercana.nombre}</h3>
+          <p className="mt-2 text-cacao-suave">
+            {masCercana.direccion}
+            {masCercana.distanciaKm !== null && (
+              <span className="font-semibold text-cacao">
+                {" · a "}
+                {formatearDistancia(masCercana.distanciaKm)}
+              </span>
+            )}
+          </p>
+          <EstadoSucursal className="mt-2" />
+          <BotonesSucursal sucursal={masCercana} />
+        </div>
+      )}
+
       <ul className="mt-6 grid gap-4 sm:grid-cols-2">
-          {ordenadas.map((sucursal) => {
-            const distancia = sucursal.distanciaKm;
-            const esLaMasCercana = sucursal.id === masCercana?.id;
-
-            return (
-              <li
-                key={sucursal.id}
-                className={`entra flex flex-col border bg-crema p-5 transition-colors ${
-                  esLaMasCercana ? "border-lima-hondo ring-2 ring-lima" : "border-borde"
-                }`}
-              >
-                {esLaMasCercana && (
-                  <span className="mb-2 w-fit bg-lima px-2.5 py-0.5 text-[0.7rem] font-bold tracking-wide text-cacao uppercase">
-                    La más cercana
-                  </span>
-                )}
-
-                <h3 className="display text-xl">{sucursal.nombre}</h3>
-                <p className="mt-1 text-sm text-cacao-suave">
-                  {sucursal.direccion}
-                  {distancia !== null && (
-                    <span className="font-semibold text-cacao">
-                      {" · "}
-                      {formatearDistancia(distancia)}
-                    </span>
-                  )}
-                </p>
-
-                <div className="mt-5 flex flex-wrap gap-2">
-                  <a
-                    href={linkWhatsApp(sucursal)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-lima px-4 py-2.5 text-sm font-bold text-cacao transition-colors hover:bg-cacao hover:text-crema"
-                  >
-                    WhatsApp
-                  </a>
-                  <a
-                    href={posicion ? linkComoLlegar(sucursal) : linkMapa(sucursal)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="border border-cacao/25 px-4 py-2.5 text-sm font-semibold transition-colors hover:border-cacao hover:bg-cacao hover:text-crema"
-                  >
-                    {posicion ? "Cómo llegar" : "Ver en el mapa"}
-                  </a>
-                </div>
-              </li>
-            );
-          })}
+        {resto.map((sucursal) => (
+          <li key={sucursal.id} className="entra flex flex-col border border-borde bg-crema p-5">
+            <h3 className="display text-xl">{sucursal.nombre}</h3>
+            <p className="mt-1 text-sm text-cacao-suave">
+              {sucursal.direccion}
+              {sucursal.distanciaKm !== null && (
+                <span className="font-semibold text-cacao">
+                  {" · a "}
+                  {formatearDistancia(sucursal.distanciaKm)}
+                </span>
+              )}
+            </p>
+            <EstadoSucursal className="mt-2" />
+            <BotonesSucursal sucursal={sucursal} />
+          </li>
+        ))}
       </ul>
     </>
   );

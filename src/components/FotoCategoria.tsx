@@ -8,6 +8,9 @@ import tartas from "@/imagenes/categorias/tartas.jpg";
 import empanadas from "@/imagenes/categorias/empanadas.jpg";
 import pizzas from "@/imagenes/categorias/pizzas.jpg";
 import canelones from "@/imagenes/productos/canelones.jpg";
+import wrapCarne from "@/imagenes/productos/wrap-carne.jpg";
+import submarino from "@/imagenes/productos/submarino.jpg";
+import torta from "@/imagenes/productos/torta.jpg";
 
 /**
  * Una foto por categoría de la carta.
@@ -42,13 +45,26 @@ const FOTOS: Record<string, StaticImageData> = {
  * Cuando el destacado de una categoría cambie, revisar si hace falta sumar acá
  * la foto del plato nuevo.
  */
+// La clave lleva la categoría adelante porque hay nombres genéricos —"Carne",
+// "Pollo", "Jamón y queso"— que se repiten en más de una categoría.
 const FOTOS_PRODUCTO: Record<string, StaticImageData> = {
-  "Canelones de carne y verdura con salsa tuco": canelones,
+  "almuerzos/Canelones de carne y verdura con salsa tuco": canelones,
+  "wraps/Carne": wrapCarne,
+  "desayunos/Submarino + 2 medialunas": submarino,
+  "desayunos/Infusión + medio tostado + vaso de jugo": sandwiches,
+  "desayunos/Infusión + porción de torta + vaso de jugo": torta,
 };
 
 const TEXTOS_PRODUCTO: Record<string, string> = {
-  "Canelones de carne y verdura con salsa tuco":
+  "almuerzos/Canelones de carne y verdura con salsa tuco":
     "Canelones con salsa de tomate y queso rallado, servidos en un plato hondo",
+  "wraps/Carne": "Wrap de carne cortado al medio, con tomate y verdes a la vista",
+  "desayunos/Submarino + 2 medialunas":
+    "Taza de submarino bien caliente con medialunas de fondo",
+  "desayunos/Infusión + medio tostado + vaso de jugo":
+    "Tostado de jamón y queso cortado en dos, sobre una mesa de madera",
+  "desayunos/Infusión + porción de torta + vaso de jugo":
+    "Porción de torta con crema y frutilla servida en un plato",
 };
 
 /** Descripciones para lectores de pantalla, no reaprovechables del nombre de la categoría. */
@@ -79,8 +95,9 @@ export function FotoCategoria({
   prioridad?: boolean;
 }) {
   // La foto del plato manda sobre la de la categoría; si no hay, cae en la genérica.
-  const foto = (producto && FOTOS_PRODUCTO[producto]) ?? FOTOS[slug];
-  const texto = (producto && TEXTOS_PRODUCTO[producto]) ?? TEXTOS[slug] ?? "";
+  const clave = producto ? `${slug}/${producto}` : null;
+  const foto = (clave && FOTOS_PRODUCTO[clave]) ?? FOTOS[slug];
+  const texto = (clave && TEXTOS_PRODUCTO[clave]) ?? TEXTOS[slug] ?? "";
   if (!foto) return null;
 
   return (

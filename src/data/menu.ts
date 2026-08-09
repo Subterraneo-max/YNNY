@@ -384,6 +384,31 @@ export const formatearPrecio = (precio: number) =>
 export const cantidadRedonda = Math.floor(todosLosProductos.length / 10) * 10;
 
 /**
+ * Los cuatro que se muestran en "Los favoritos de YNNY": un café con facturas,
+ * un submarino con medialunas, un tostado y algo de pastelería.
+ *
+ * Acá van solo los nombres. El precio se busca en la carta, así que no puede
+ * quedar desactualizado ni contradecir lo que dice la página de carta. Si algún
+ * nombre deja de existir, el build falla en vez de mostrar una tarjeta vacía.
+ */
+const NOMBRES_FAVORITOS = [
+  "Infusión + 2 facturas",
+  "Submarino + 2 medialunas",
+  "Infusión + medio tostado + vaso de jugo",
+  "Infusión + porción de torta + vaso de jugo",
+] as const;
+
+export const favoritos = NOMBRES_FAVORITOS.map((nombre) => {
+  const producto = todosLosProductos.find((p) => p.nombre === nombre);
+  if (!producto) {
+    throw new Error(
+      `El favorito "${nombre}" no existe en la carta. Revisá NOMBRES_FAVORITOS en src/data/menu.ts.`,
+    );
+  }
+  return producto;
+});
+
+/**
  * Selección para el carrusel de la home: un producto por categoría, eligiendo el
  * más barato de cada una para que el escaparate arranque por el precio de entrada.
  * Los precios salen de `categorias`, nunca se escriben dos veces.

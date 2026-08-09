@@ -74,7 +74,7 @@ Lighthouse mobile sobre el build de producción:
 
 | | Home | Carta | Sucursales |
 |---|---|---|---|
-| Performance | 88 | 91 | 92 |
+| Performance | 80 | 90 | 93 |
 | Accesibilidad | 100 | 100 | 100 |
 | Buenas prácticas | 100 | 100 | 100 |
 | SEO | 100\* | 100\* | 100\* |
@@ -94,6 +94,23 @@ buscadores. Con `esDemo: false` da 100 y sin fallas.
 La home sigue siendo la página más pesada porque es la que más cosas anima. Si en algún
 momento pesa más el número que el efecto, lo que más recupera es sacar el parallax del
 hero y las marquesinas.
+
+## Horarios y "abierto ahora"
+
+El estado de cada sucursal se calcula con la hora local de Rosario
+(`src/lib/horarios.ts`) a partir de los horarios de `src/data/sucursales.ts`. Se
+recalcula solo cada 30 s y no se renderiza en el servidor: las páginas son estáticas,
+así que si se calculara ahí quedaría congelado en la hora del build.
+
+Los casos límite están cubiertos por un test:
+
+```bash
+npx tsx pruebas/horarios.prueba.ts
+```
+
+**Limitación conocida:** no hay calendario de feriados cargado, así que un feriado
+entre semana se calcula con el horario de lunes a sábados. Hay que confirmar con el
+cliente si esos días abren distinto.
 
 ## Lo que falta antes de mostrarla
 

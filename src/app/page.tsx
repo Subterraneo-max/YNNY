@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CarruselDestacados } from "@/components/CarruselDestacados";
 import { FilasCategorias } from "@/components/FilasCategorias";
+import { Favoritos } from "@/components/Favoritos";
 import { Hero } from "@/components/Hero";
 import { FotoCategoria } from "@/components/FotoCategoria";
 import { MapaSucursales } from "@/components/MapaSucursales";
@@ -20,8 +21,26 @@ export default function Inicio() {
 
       <Marquesina textos={nombresCategorias} velocidad={30} />
 
-      {/* ---------- Escaparate ---------- */}
+      {/* ---------- Favoritos ---------- */}
       <section className="py-20 sm:py-28">
+        <div className="mx-auto mb-10 max-w-6xl px-4">
+          <TituloRevelado
+            texto="Los favoritos de YNNY"
+            como="h2"
+            className="display text-[clamp(2.2rem,8vw,5rem)]"
+          />
+          <Revelar retraso={0.15}>
+            <p className="mt-4 max-w-md leading-relaxed text-cacao-suave">
+              Lo que más se pide en el mostrador, todos los días.
+            </p>
+          </Revelar>
+        </div>
+
+        <Favoritos />
+      </section>
+
+      {/* ---------- Escaparate por categoría ---------- */}
+      <section className="bg-crema-hondo py-20 sm:py-28">
         <div className="mx-auto mb-4 max-w-6xl px-4">
           <TituloRevelado
             texto="Nuestra carta"
@@ -30,7 +49,7 @@ export default function Inicio() {
           />
           <Revelar retraso={0.15}>
             <p className="mt-4 max-w-md leading-relaxed text-cacao-suave">
-              Descubrí algunas de nuestras opciones más elegidas y explorá la carta completa.
+              Ocho categorías, todas recién hechas. Entrá y mirá la carta completa.
             </p>
           </Revelar>
         </div>
@@ -56,7 +75,7 @@ export default function Inicio() {
       </section>
 
       {/* ---------- Categorías ---------- */}
-      <section className="bg-crema-hondo py-20 sm:py-28">
+      <section className="py-20 sm:py-28">
         <div className="mx-auto mb-10 max-w-6xl px-4">
           <TituloRevelado
             texto="Qué vas a encontrar"
@@ -132,9 +151,14 @@ export default function Inicio() {
               </Revelar>
             </div>
 
-            {/* Mosaico, en el lugar de la grilla de fotos de la referencia */}
+            {/*
+              Mosaico de cierre, en el lugar de la grilla de fotos de la referencia.
+              Van tres y no seis: para cuando se llega acá, estas mismas fotos ya
+              se vieron en el carrusel y en las filas de categorías, y repetirlas
+              seis veces más recargaba la sección sin agregar nada.
+            */}
             <Revelar escalonar className="grid grid-cols-3 gap-2 sm:gap-3">
-              {categorias.slice(0, 6).map((categoria) => (
+              {categorias.slice(0, 3).map((categoria) => (
                 <div
                   key={categoria.slug}
                   className="aspect-square overflow-hidden rounded-xl shadow-[0_10px_24px_-12px_rgb(53_41_31_/_0.4)]"
