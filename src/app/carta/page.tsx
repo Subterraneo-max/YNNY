@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { CartaNavegable } from "@/components/CartaNavegable";
 import { Marquesina } from "@/components/Marquesina";
 import { TituloEntrada } from "@/components/TituloEntrada";
-import { categorias, todosLosProductos } from "@/data/menu";
+import { cantidadRedonda, categorias } from "@/data/menu";
 import { sitio } from "@/lib/sitio";
 
 export const metadata: Metadata = {
@@ -27,8 +27,8 @@ export default function PaginaCarta() {
         />
         <div className="entra" style={{ "--d": 220 } as React.CSSProperties}>
           <p className="mt-5 max-w-xl leading-relaxed text-cacao-suave">
-            {todosLosProductos.length} productos en {categorias.length} categorías. Buscá lo
-            que quieras o tocá una categoría para ir directo.
+            Más de {cantidadRedonda} opciones en {categorias.length} categorías, todas
+            recién hechas. Buscá lo que quieras o elegí una categoría.
           </p>
         </div>
       </div>

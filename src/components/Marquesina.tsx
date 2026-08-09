@@ -77,9 +77,12 @@ export function Marquesina({
         {contenido.map((texto, indice) => (
           <div key={`${texto}-${indice}`} className="flex shrink-0 items-center gap-8 sm:gap-12">
             <span className="display text-2xl whitespace-nowrap sm:text-4xl">{texto}</span>
-            <span className="text-xl text-lima sm:text-2xl" aria-hidden="true">
-              ✳
-            </span>
+            {/* Separador dibujado, no un carácter: un punto sólido se mantiene igual
+                en cualquier tipografía y no se lee como un emoji de relleno. */}
+            <span
+              aria-hidden="true"
+              className="size-2 shrink-0 rounded-full bg-lima sm:size-2.5"
+            />
           </div>
         ))}
       </div>

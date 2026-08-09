@@ -378,6 +378,12 @@ export const formatearPrecio = (precio: number) =>
   "$" + precio.toLocaleString("es-AR");
 
 /**
+ * Para los textos de la web: "más de 70" se lee mejor que un número exacto y,
+ * sobre todo, no queda desactualizado cada vez que se suma o saca un producto.
+ */
+export const cantidadRedonda = Math.floor(todosLosProductos.length / 10) * 10;
+
+/**
  * Selección para el carrusel de la home: un producto por categoría, eligiendo el
  * más barato de cada una para que el escaparate arranque por el precio de entrada.
  * Los precios salen de `categorias`, nunca se escriben dos veces.

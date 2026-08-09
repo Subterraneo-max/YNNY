@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { IlustracionProducto, TIPO_POR_CATEGORIA } from "@/components/IlustracionProducto";
+import { FotoCategoria } from "@/components/FotoCategoria";
 import { categorias, formatearPrecio } from "@/data/menu";
 import {
   gsap,
@@ -67,15 +67,13 @@ export function FilasCategorias() {
                 desdeLaDerecha ? "sm:flex-row-reverse sm:text-right" : ""
               }`}
             >
-              <div
-                className={`w-24 shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110 sm:w-40 ${
-                  desdeLaDerecha ? "group-hover:-rotate-6" : "group-hover:rotate-6"
-                }`}
-              >
-                <IlustracionProducto
-                  tipo={TIPO_POR_CATEGORIA[categoria.slug] ?? "plato"}
-                  nombre={categoria.nombre}
-                  className="w-full"
+              {/* El zoom va en la foto y no en el marco: así la imagen crece dentro
+                  del recorte en vez de agrandar el bloque y mover la fila entera. */}
+              <div className="size-24 shrink-0 overflow-hidden rounded-2xl shadow-[0_14px_30px_-12px_rgb(53_41_31_/_0.45)] sm:size-40">
+                <FotoCategoria
+                  slug={categoria.slug}
+                  sizes="(min-width: 640px) 160px, 96px"
+                  className="transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
                 />
               </div>
 

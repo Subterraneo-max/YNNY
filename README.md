@@ -33,16 +33,18 @@ marquesinas, escaparate horizontal y filas alternadas. Dos decisiones deliberada
 
 - **El verde lima de YNNY se conserva como acento.** La referencia es enteramente marrón,
   pero tirar el color de marca del cliente para copiar una maqueta sería un mal negocio.
-- **El hero lleva dos fotos reales; el resto son ilustraciones SVG.** Las dos fotos
-  (`src/imagenes/`) salen de Unsplash, cuya licencia permite uso comercial sin atribución.
-  Las ilustraciones de las demás secciones (`src/components/IlustracionProducto.tsx`)
-  ocupan exactamente el lugar de una foto y se reemplazan por `<Image>` sin tocar el
-  layout.
+- **Todo es fotografía real: no quedan ilustraciones ni íconos.** Dos fotos en el hero
+  (`src/imagenes/`) y una por cada categoría de la carta
+  (`src/imagenes/categorias/`), que se reparten entre el carrusel, las filas de
+  categorías, el mosaico de cierre y las cabeceras de la carta. Todas salen de Unsplash,
+  cuya licencia permite uso comercial sin atribución, y están elegidas con el mismo
+  criterio —luz cálida, madera o cerámica, producto llenando el encuadre— para que
+  puestas juntas parezcan de la misma sesión.
 
-  **Las fotos del hero son de un café genérico, no de YNNY.** Sirven para que la demo se
-  vea terminada, pero un dueño rosarino nota que ese croissant no es una medialuna. Antes
-  de mostrarla conviene cambiarlas por dos fotos de ellos: son dos archivos en
-  `src/imagenes/` con el mismo nombre y listo.
+  **Son de locales genéricos, no de YNNY.** Sirven para que la demo se vea terminada,
+  pero un dueño rosarino nota que ese croissant no es una medialuna. Antes de mostrarla
+  conviene cambiarlas por fotos de ellos: es reemplazar archivos en `src/imagenes/`
+  respetando los nombres. Nada más que tocar.
 
 - **El hero cambia de composición según el ancho.** En pantalla grande las fotos flotan a
   los costados del titular saliéndose por el borde, como en la referencia. En celular eso
@@ -72,7 +74,7 @@ Lighthouse mobile sobre el build de producción:
 
 | | Home | Carta | Sucursales |
 |---|---|---|---|
-| Performance | 89 | 92 | 96 |
+| Performance | 88 | 91 | 92 |
 | Accesibilidad | 100 | 100 | 100 |
 | Buenas prácticas | 100 | 100 | 100 |
 | SEO | 100\* | 100\* | 100\* |
@@ -85,8 +87,8 @@ buscadores. Con `esDemo: false` da 100 y sin fallas.
 
 | | Antes del rediseño | Con Motion | Sin Motion (actual) |
 |---|---|---|---|
-| Performance (home) | 98 | 87 | 89 |
-| Performance (carta) | 98 | 84 | 92 |
+| Performance (home) | 98 | 87 | 88 |
+| Performance (carta) | 98 | 84 | 91 |
 | JavaScript | ~150 KB | 254 KB | 204 KB |
 
 La home sigue siendo la página más pesada porque es la que más cosas anima. Si en algún
@@ -102,7 +104,8 @@ hero y las marquesinas.
       más alto de la carta y queda raro frente a un tostado de miga a $5.400.
 - [ ] **Confirmar "Acelga y queso, brócoli"** (`menu.ts`): no se sabe si es un sabor o dos.
 - [ ] **Probarla en tu celular con datos móviles**, no en el emulador del navegador.
-- [ ] Fotos reales. Es lo que más la mejora, y es lo primero que hay que pedir al cerrar.
+- [ ] **Cambiar las 10 fotos por fotos de YNNY.** Es lo que más la mejora y lo primero
+      que hay que pedir al cerrar.
 
 ## Dos cosas rotas en el Linktree actual
 

@@ -55,8 +55,7 @@ export function ListaSucursales({ sucursales }: { sucursales: Sucursal[] }) {
               ¿Cuál te queda más cerca?
             </h2>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-cacao-suave">
-              Te ordenamos las sucursales por distancia y te abrimos el WhatsApp de esa misma
-              sucursal, no el de otra.
+              Encontrá tu YNNY más cercano y contactá directamente con esa sucursal.
             </p>
 
             {estado === "inicial" && (

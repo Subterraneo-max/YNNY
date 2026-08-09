@@ -6,7 +6,7 @@ import { BuscadorHero } from "@/components/BuscadorHero";
 import { TextoEnLetras } from "@/components/TextoEnLetras";
 import { gsap, registrarGsap, prefiereMenosMovimiento } from "@/lib/animaciones";
 import { sucursales } from "@/data/sucursales";
-import { todosLosProductos } from "@/data/menu";
+import { cantidadRedonda } from "@/data/menu";
 import { sitio } from "@/lib/sitio";
 import fotoClose from "@/imagenes/cafe-pasteleria-close.jpg";
 import fotoCozy from "@/imagenes/cafe-pasteleria-cozy.jpg";
@@ -126,7 +126,7 @@ export function Hero() {
             style={{ "--d": 300 } as React.CSSProperties}
           >
             Panadería, pastelería y cafetería en {sucursales.length} sucursales de{" "}
-            {sitio.ciudad}. {todosLosProductos.length} cosas para desayunar, almorzar o
+            {sitio.ciudad}. Más de {cantidadRedonda} opciones para desayunar, almorzar o
             merendar.
           </p>
 
@@ -143,7 +143,7 @@ export function Hero() {
           >
             {[
               { dato: sucursales.length, etiqueta: "sucursales" },
-              { dato: todosLosProductos.length, etiqueta: "productos" },
+              { dato: `+${cantidadRedonda}`, etiqueta: "opciones" },
               { dato: "7 a 21", etiqueta: "todos los días" },
             ].map((item) => (
               <li key={item.etiqueta} className="text-center">

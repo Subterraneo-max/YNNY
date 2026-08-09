@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { IlustracionProducto, TIPO_POR_CATEGORIA } from "@/components/IlustracionProducto";
+import { FotoCategoria } from "@/components/FotoCategoria";
 import { Revelar } from "@/components/Revelar";
 import { destacados, formatearPrecio } from "@/data/menu";
 
@@ -61,17 +61,17 @@ export function CarruselDestacados() {
         <ul
           ref={pista}
           onScroll={alScrollear}
-          className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pt-16 pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pt-20 pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {destacados.map((producto) => (
             <li key={producto.categoriaSlug} className="w-64 shrink-0 snap-start sm:w-72">
-              <div className="group relative rounded-sm bg-cacao pt-16 pb-5 text-crema transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-2.5">
-                {/* La ilustración se desborda por arriba, como las tazas de la referencia. */}
-                <IlustracionProducto
-                  tipo={TIPO_POR_CATEGORIA[producto.categoriaSlug] ?? "plato"}
-                  nombre={producto.nombre}
-                  className="absolute -top-14 left-1/2 w-36 -translate-x-1/2 drop-shadow-xl transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110 group-hover:-rotate-6"
-                />
+              {/* La foto mide 128 px y asoma 64 hacia arriba, así que entra 64 dentro
+                  de la tarjeta: el pt-20 es lo que evita que el círculo tape la
+                  etiqueta de categoría. Si cambia el tamaño de la foto, cambia acá. */}
+              <div className="group relative rounded-xl bg-cacao pt-20 pb-5 text-crema transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-2.5">
+                <div className="absolute -top-16 left-1/2 size-32 -translate-x-1/2 overflow-hidden rounded-full shadow-[0_16px_34px_-10px_rgb(53_41_31_/_0.55)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105">
+                  <FotoCategoria slug={producto.categoriaSlug} sizes="128px" />
+                </div>
 
                 <div className="px-5">
                   <p className="text-[0.7rem] font-bold tracking-[0.16em] text-lima uppercase">

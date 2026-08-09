@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CarruselDestacados } from "@/components/CarruselDestacados";
 import { FilasCategorias } from "@/components/FilasCategorias";
 import { Hero } from "@/components/Hero";
-import { IlustracionProducto, TIPO_POR_CATEGORIA } from "@/components/IlustracionProducto";
+import { FotoCategoria } from "@/components/FotoCategoria";
 import { MapaSucursales } from "@/components/MapaSucursales";
 import { Marquesina } from "@/components/Marquesina";
 import { Revelar } from "@/components/Revelar";
@@ -30,8 +30,7 @@ export default function Inicio() {
           />
           <Revelar retraso={0.15}>
             <p className="mt-4 max-w-md leading-relaxed text-cacao-suave">
-              Lo más barato de cada categoría, para que veas por dónde arranca. Después está
-              la carta entera.
+              Descubrí algunas de nuestras opciones más elegidas y explorá la carta completa.
             </p>
           </Revelar>
         </div>
@@ -83,8 +82,7 @@ export default function Inicio() {
             />
             <Revelar retraso={0.15}>
               <p className="mt-5 max-w-md leading-relaxed text-cacao-suave">
-                Cada local tiene su propio WhatsApp. Te decimos cuál te queda más cerca y te
-                abrimos el chat de esa sucursal, no el de otra.
+                Encontrá tu YNNY más cercano y contactá directamente con esa sucursal.
               </p>
 
               <dl className="mt-7 space-y-2">
@@ -123,8 +121,7 @@ export default function Inicio() {
               />
               <Revelar retraso={0.15}>
                 <p className="mt-5 max-w-sm leading-relaxed text-cacao-suave">
-                  Escribinos por WhatsApp a la sucursal que te quede más cerca y te lo
-                  preparamos.
+                  Elegí tu sucursal y hacé tu pedido por WhatsApp. Lo preparamos al momento.
                 </p>
                 <Link
                   href="/sucursales"
@@ -138,11 +135,13 @@ export default function Inicio() {
             {/* Mosaico, en el lugar de la grilla de fotos de la referencia */}
             <Revelar escalonar className="grid grid-cols-3 gap-2 sm:gap-3">
               {categorias.slice(0, 6).map((categoria) => (
-                <div key={categoria.slug} className="aspect-square bg-crema p-2">
-                  <IlustracionProducto
-                    tipo={TIPO_POR_CATEGORIA[categoria.slug] ?? "plato"}
-                    nombre={categoria.nombre}
-                    className="size-full"
+                <div
+                  key={categoria.slug}
+                  className="aspect-square overflow-hidden rounded-xl shadow-[0_10px_24px_-12px_rgb(53_41_31_/_0.4)]"
+                >
+                  <FotoCategoria
+                    slug={categoria.slug}
+                    sizes="(min-width: 1024px) 160px, 30vw"
                   />
                 </div>
               ))}

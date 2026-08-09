@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useSyncExternalStore } from "react";
-import { IlustracionProducto, TIPO_POR_CATEGORIA } from "@/components/IlustracionProducto";
+import { FotoCategoria } from "@/components/FotoCategoria";
 import { categorias, formatearPrecio, todosLosProductos } from "@/data/menu";
 
 /** Para que "arabe" encuentre "Árabe" y "cafe" encuentre "café". */
@@ -163,11 +163,12 @@ export function CartaNavegable() {
                 <div
                   className="flex items-end gap-4 border-b-2 border-cacao pb-3"
                 >
-                  <IlustracionProducto
-                    tipo={TIPO_POR_CATEGORIA[categoria.slug] ?? "plato"}
-                    nombre={categoria.nombre}
-                    className="w-16 shrink-0 sm:w-20"
-                  />
+                  <div className="size-14 shrink-0 overflow-hidden rounded-xl shadow-[0_10px_22px_-10px_rgb(53_41_31_/_0.4)] sm:size-20">
+                    <FotoCategoria
+                      slug={categoria.slug}
+                      sizes="(min-width: 640px) 80px, 56px"
+                    />
+                  </div>
                   <div className="min-w-0 flex-1">
                     <h2 className="display text-[clamp(1.6rem,6vw,2.8rem)]">
                       {categoria.nombre}
