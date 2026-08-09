@@ -70,7 +70,11 @@ export function CarruselDestacados() {
                   etiqueta de categoría. Si cambia el tamaño de la foto, cambia acá. */}
               <div className="group relative rounded-xl bg-cacao pt-20 pb-5 text-crema transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-2.5">
                 <div className="absolute -top-16 left-1/2 size-32 -translate-x-1/2 overflow-hidden rounded-full shadow-[0_16px_34px_-10px_rgb(53_41_31_/_0.55)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105">
-                  <FotoCategoria slug={producto.categoriaSlug} sizes="128px" />
+                  <FotoCategoria
+                    slug={producto.categoriaSlug}
+                    producto={producto.nombre}
+                    sizes="128px"
+                  />
                 </div>
 
                 <div className="px-5">

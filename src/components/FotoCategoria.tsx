@@ -7,6 +7,7 @@ import ensaladas from "@/imagenes/categorias/ensaladas.jpg";
 import tartas from "@/imagenes/categorias/tartas.jpg";
 import empanadas from "@/imagenes/categorias/empanadas.jpg";
 import pizzas from "@/imagenes/categorias/pizzas.jpg";
+import canelones from "@/imagenes/productos/canelones.jpg";
 
 /**
  * Una foto por categoría de la carta.
@@ -30,6 +31,26 @@ const FOTOS: Record<string, StaticImageData> = {
   pizzas,
 };
 
+/**
+ * Fotos de un plato puntual.
+ *
+ * El carrusel de la home no anuncia una categoría sino un producto concreto, así
+ * que la foto de la categoría no siempre sirve: "Almuerzos" se representa bien
+ * con una milanesa, pero el plato destacado son canelones, y mostrar una
+ * milanesa debajo de la palabra "canelones" es directamente un error.
+ *
+ * Cuando el destacado de una categoría cambie, revisar si hace falta sumar acá
+ * la foto del plato nuevo.
+ */
+const FOTOS_PRODUCTO: Record<string, StaticImageData> = {
+  "Canelones de carne y verdura con salsa tuco": canelones,
+};
+
+const TEXTOS_PRODUCTO: Record<string, string> = {
+  "Canelones de carne y verdura con salsa tuco":
+    "Canelones con salsa de tomate y queso rallado, servidos en un plato hondo",
+};
+
 /** Descripciones para lectores de pantalla, no reaprovechables del nombre de la categoría. */
 const TEXTOS: Record<string, string> = {
   desayunos: "Medialunas recién horneadas, doradas y hojaldradas",
@@ -44,23 +65,28 @@ const TEXTOS: Record<string, string> = {
 
 export function FotoCategoria({
   slug,
+  producto,
   className = "",
   sizes,
   prioridad = false,
 }: {
   slug: string;
+  /** Nombre del plato, cuando lo que se anuncia es un producto y no la categoría. */
+  producto?: string;
   className?: string;
   /** Anchos reales de render, para que el navegador no baje una imagen más grande de la necesaria. */
   sizes: string;
   prioridad?: boolean;
 }) {
-  const foto = FOTOS[slug];
+  // La foto del plato manda sobre la de la categoría; si no hay, cae en la genérica.
+  const foto = (producto && FOTOS_PRODUCTO[producto]) ?? FOTOS[slug];
+  const texto = (producto && TEXTOS_PRODUCTO[producto]) ?? TEXTOS[slug] ?? "";
   if (!foto) return null;
 
   return (
     <Image
       src={foto}
-      alt={TEXTOS[slug] ?? ""}
+      alt={texto}
       placeholder="blur"
       loading={prioridad ? undefined : "lazy"}
       priority={prioridad}
