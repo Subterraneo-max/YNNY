@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { sitio } from "@/lib/sitio";
 
@@ -13,6 +13,8 @@ const enlaces = [
 export function Encabezado() {
   const [oculto, setOculto] = useState(false);
   const [despegado, setDespegado] = useState(false);
+  const aviso = useRef<HTMLParagraphElement>(null);
+  const barra = useRef<HTMLElement>(null);
 
   useEffect(() => {
     let anterior = window.scrollY;
@@ -30,10 +32,42 @@ export function Encabezado() {
     return () => window.removeEventListener("scroll", alScrollear);
   }, []);
 
+  /**
+   * Publica cuánto ocupa el encabezado fijo, para que lo que se pegue debajo
+   * —el buscador de la carta— sepa dónde apoyarse.
+   *
+   * No se puede dejar fijo en CSS por dos motivos: la barra de navegación se
+   * esconde al bajar (y entonces solo queda el aviso), y el aviso mismo pasa de
+   * una a dos líneas según el ancho. Con un valor escrito a mano, el buscador
+   * quedaba flotando con un hueco arriba justo cuando la barra se escondía.
+   */
+  useEffect(() => {
+    const medir = () => {
+      const altoAviso = aviso.current?.offsetHeight ?? 0;
+      const altoBarra = barra.current?.offsetHeight ?? 0;
+      const raiz = document.documentElement.style;
+
+      // Lo que tapa ahora mismo: sirve para apoyar cosas pegajosas debajo.
+      raiz.setProperty("--tope-pegajoso", `${altoAviso + (oculto ? 0 : altoBarra)}px`);
+
+      // Lo que podría llegar a tapar: sirve para los anclajes. Un salto hacia
+      // arriba hace reaparecer la barra, así que el destino tiene que dejar
+      // lugar para ella aunque en ese instante esté escondida.
+      raiz.setProperty("--tope-completo", `${altoAviso + altoBarra}px`);
+    };
+
+    medir();
+    window.addEventListener("resize", medir);
+    return () => window.removeEventListener("resize", medir);
+  }, [oculto]);
+
   return (
     <div className="fixed inset-x-0 top-0 z-50">
       {sitio.esDemo && (
-        <p className="bg-cacao px-4 py-1.5 text-center text-[0.72rem] leading-tight text-crema/85 sm:text-xs">
+        <p
+          ref={aviso}
+          className="bg-cacao px-4 py-1.5 text-center text-[0.72rem] leading-tight text-crema/85 sm:text-xs"
+        >
           <span className="font-semibold text-lima">Propuesta no oficial</span>
           <span className="mx-1.5 text-crema/40">·</span>
           Demo hecha por {sitio.autorDemo}. No pertenece a {sitio.nombreCorto}.
@@ -41,6 +75,7 @@ export function Encabezado() {
       )}
 
       <header
+        ref={barra}
         className={`transition-[transform,background-color,border-color] duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
           oculto ? "-translate-y-[130%]" : "translate-y-0"
         } ${despegado ? "border-b border-borde bg-crema/90 backdrop-blur-md" : "border-b border-transparent bg-transparent"}`}

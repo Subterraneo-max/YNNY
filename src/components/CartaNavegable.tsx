@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { FotoCategoria } from "@/components/FotoCategoria";
 import { categorias, formatearPrecio, todosLosProductos } from "@/data/menu";
 
@@ -66,6 +66,25 @@ function suscribirAlHash(alCambiar: () => void) {
 }
 
 export function CartaNavegable() {
+  const barraBusqueda = useRef<HTMLDivElement>(null);
+
+  /**
+   * Publica el alto de la barra de búsqueda para que los anclajes de categoría
+   * caigan justo debajo de ella. Cambia con el ancho de pantalla (los chips se
+   * acomodan distinto), así que medirlo es más confiable que estimarlo.
+   */
+  useEffect(() => {
+    const medir = () => {
+      document.documentElement.style.setProperty(
+        "--alto-buscador",
+        `${barraBusqueda.current?.offsetHeight ?? 0}px`,
+      );
+    };
+    medir();
+    window.addEventListener("resize", medir);
+    return () => window.removeEventListener("resize", medir);
+  }, []);
+
   // El buscador del hero manda el término por el hash (#q=…) para que esta página
   // siga siendo estática. En el servidor no hay hash, de ahí el tercer argumento.
   const hash = useSyncExternalStore(
@@ -92,7 +111,18 @@ export function CartaNavegable() {
 
   return (
     <>
-      <div className="sticky top-[5.6rem] z-30 -mx-4 border-y border-borde bg-crema/95 px-4 py-3 backdrop-blur-md">
+      {/*
+        Se apoya justo debajo del encabezado fijo, que cambia de alto: la barra
+        de navegación se esconde al bajar y el aviso de demo ocupa una o dos
+        líneas según el ancho. `--tope-pegajoso` lo publica el encabezado ya
+        medido; el valor de reserva es para el primer render, antes de que corra
+        el JavaScript.
+      */}
+      <div
+        ref={barraBusqueda}
+        style={{ top: "var(--tope-pegajoso, 5.6rem)" }}
+        className="sticky z-30 -mx-4 border-y border-borde bg-crema/95 px-4 py-3 backdrop-blur-md transition-[top] duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+      >
         <label className="sr-only" htmlFor="buscar">
           Buscar en la carta
         </label>
@@ -164,7 +194,15 @@ export function CartaNavegable() {
         ) : (
           <div>
             {categorias.map((categoria) => (
-              <section key={categoria.slug} id={categoria.slug} className="mt-16 scroll-mt-52">
+              <section
+                key={categoria.slug}
+                id={categoria.slug}
+                className="mt-16"
+                style={{
+                  scrollMarginTop:
+                    "calc(var(--tope-completo, 6.5rem) + var(--alto-buscador, 8rem) + 0.75rem)",
+                }}
+              >
                 <div
                   className="flex items-end gap-4 border-b-2 border-cacao pb-3"
                 >
