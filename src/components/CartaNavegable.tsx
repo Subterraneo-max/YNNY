@@ -174,16 +174,25 @@ export function CartaNavegable() {
                       sizes="(min-width: 640px) 80px, 56px"
                     />
                   </div>
-                  <div className="min-w-0 flex-1">
+                  {/*
+                    En celular el precio va debajo del título, no al lado.
+
+                    Compartiendo la fila, el flex le achicaba la caja al título
+                    para hacerle lugar al precio, y como los nombres son una sola
+                    palabra larga no tenían por dónde cortar: "ALMUERZOS" se salía
+                    108 px de su caja y se montaba sobre el precio. En pantalla
+                    ancha sobra lugar, así que ahí siguen en la misma línea.
+                  */}
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
                     <h2 className="display text-[clamp(1.6rem,6vw,2.8rem)]">
                       {categoria.nombre}
                     </h2>
+                    {categoria.precioUnico && (
+                      <p className="display text-lg text-lima-hondo sm:shrink-0 sm:pb-1">
+                        Todas {formatearPrecio(categoria.precioUnico)}
+                      </p>
+                    )}
                   </div>
-                  {categoria.precioUnico && (
-                    <p className="display shrink-0 pb-1 text-lg text-lima-hondo">
-                      Todas {formatearPrecio(categoria.precioUnico)}
-                    </p>
-                  )}
                 </div>
 
                 {categoria.nota && (
