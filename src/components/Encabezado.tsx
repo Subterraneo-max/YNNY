@@ -90,7 +90,7 @@ export function Encabezado() {
               <Link
                 key={enlace.href}
                 href={enlace.href}
-                className="group relative text-sm font-semibold tracking-wide"
+                className="group relative py-2 text-sm font-semibold tracking-wide"
               >
                 {enlace.texto}
                 {/* Subrayado que crece desde la izquierda al pasar por encima. */}
@@ -102,7 +102,9 @@ export function Encabezado() {
           {/* En celular el rótulo se acorta: "Pedir ahora" junto al logo y al link
               de Carta no entra en 390 px y el botón terminaba cortado. */}
           <div className="flex items-center gap-3">
-            <Link href="/carta" className="text-sm font-semibold tracking-wide sm:hidden">
+            {/* py-2.5 para que el área de toque llegue a ~44 px: es navegación
+                principal en celular y con 20 px de alto se erraba. */}
+            <Link href="/carta" className="py-2.5 text-sm font-semibold tracking-wide sm:hidden">
               Carta
             </Link>
             <Link

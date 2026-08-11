@@ -222,7 +222,9 @@ export function CartaNavegable() {
                     ancha sobra lugar, así que ahí siguen en la misma línea.
                   */}
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
-                    <h2 className="display text-[clamp(1.6rem,6vw,2.8rem)]">
+                    {/* Mismo motivo que en las filas de la home: a 320 px
+                        "SÁNDWICHES" no entraba en su caja y quedaba cortado. */}
+                    <h2 className="display text-[clamp(1.35rem,6vw,2.8rem)]">
                       {categoria.nombre}
                     </h2>
                     {categoria.precioUnico && (

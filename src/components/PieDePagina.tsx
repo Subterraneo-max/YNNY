@@ -17,7 +17,7 @@ export function PieDePagina() {
             href={sitio.instagram}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 inline-block text-sm font-semibold text-lima underline-offset-4 hover:underline"
+            className="mt-4 inline-block py-1.5 text-sm font-semibold text-lima underline-offset-4 hover:underline"
           >
             @ynnycafe
           </a>
@@ -41,12 +41,12 @@ export function PieDePagina() {
           <h2 className="text-[0.7rem] font-bold tracking-[0.18em] text-crema/70 uppercase">
             Carta
           </h2>
-          <ul className="mt-5 space-y-2 text-sm">
+          <ul className="mt-4 text-sm">
             {categorias.map((categoria) => (
               <li key={categoria.slug}>
                 <Link
                   href={`/carta#${categoria.slug}`}
-                  className="text-crema/75 underline-offset-4 transition-colors hover:text-lima hover:underline"
+                  className="inline-block py-1.5 text-crema/75 underline-offset-4 transition-colors hover:text-lima hover:underline"
                 >
                   {categoria.nombre}
                 </Link>
@@ -59,7 +59,7 @@ export function PieDePagina() {
           <h2 className="text-[0.7rem] font-bold tracking-[0.18em] text-crema/70 uppercase">
             Sucursales
           </h2>
-          <ul className="mt-5 space-y-2 text-sm">
+          <ul className="mt-4 text-sm">
             {sucursales.slice(0, 6).map((sucursal) => (
               <li key={sucursal.id} className="text-crema/75">
                 {sucursal.nombre}
@@ -68,7 +68,7 @@ export function PieDePagina() {
             <li>
               <Link
                 href="/sucursales"
-                className="font-semibold text-lima underline-offset-4 hover:underline"
+                className="inline-block py-1.5 font-semibold text-lima underline-offset-4 hover:underline"
               >
                 Ver las {sucursales.length} →
               </Link>

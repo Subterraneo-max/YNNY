@@ -69,7 +69,7 @@ export function FilasCategorias() {
             >
               {/* El zoom va en la foto y no en el marco: así la imagen crece dentro
                   del recorte en vez de agrandar el bloque y mover la fila entera. */}
-              <div className="size-24 shrink-0 overflow-hidden rounded-2xl shadow-[0_14px_30px_-12px_rgb(53_41_31_/_0.45)] sm:size-40">
+              <div className="size-20 shrink-0 overflow-hidden rounded-2xl shadow-[0_14px_30px_-12px_rgb(53_41_31_/_0.45)] sm:size-40">
                 <FotoCategoria
                   slug={categoria.slug}
                   sizes="(min-width: 640px) 160px, 96px"
@@ -78,7 +78,13 @@ export function FilasCategorias() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <h3 className="display text-[clamp(1.6rem,5.5vw,3.5rem)] transition-colors group-hover:text-lima-hondo">
+                {/*
+                  El mínimo del clamp es 1.25rem y no 1.6rem por los teléfonos
+                  angostos: a 320 px el título tiene 188 px de caja y, a 1,6rem,
+                  "SÁNDWICHES" —una sola palabra, sin dónde cortar— pedía 223 y
+                  quedaba cortado por el overflow-x-clip de la lista.
+                */}
+                <h3 className="display text-[clamp(1.25rem,5.5vw,3.5rem)] transition-colors group-hover:text-lima-hondo">
                   {categoria.nombre}
                 </h3>
                 <p className="mt-1.5 text-sm text-cacao-suave">
