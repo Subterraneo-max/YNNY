@@ -81,7 +81,7 @@ export function ListaSucursales({ sucursales }: { sucursales: Sucursal[] }) {
   return (
     <>
       <div className="bg-crema-hondo p-6 sm:p-9">
-        <div className="grid items-center gap-8 sm:grid-cols-[1fr_auto]">
+        <div className="grid items-center gap-8 lg:grid-cols-2">
           <div>
             <h2 className="display text-[clamp(1.5rem,5vw,2.4rem)]">
               ¿Cuál te queda más cerca?
@@ -111,9 +111,15 @@ export function ListaSucursales({ sucursales }: { sucursales: Sucursal[] }) {
             )}
           </div>
 
-          <div className="w-full max-w-[15rem] justify-self-center sm:justify-self-end">
-            <MapaSucursales sucursales={sucursales} destacadaId={masCercana?.id} />
-          </div>
+          {/*
+            El mapa marca las 10 sucursales y, en cuanto la persona comparte su
+            ubicación, resalta la más cercana y vuela hasta ella.
+          */}
+          <MapaSucursales
+            sucursales={sucursales}
+            destacadaId={masCercana?.id}
+            className="h-[20rem] sm:h-[24rem]"
+          />
         </div>
       </div>
 

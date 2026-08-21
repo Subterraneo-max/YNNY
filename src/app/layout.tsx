@@ -81,6 +81,15 @@ function datosEstructurados() {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es-AR" className={archivo.variable}>
+      <head>
+        {/*
+          El mapa de sucursales trae los tiles de OpenStreetMap. Abrir la conexión
+          (DNS + TLS) mientras todavía se está pintando la página ahorra unos 300 ms
+          cuando el mapa efectivamente aparece.
+        */}
+        <link rel="preconnect" href="https://tile.openstreetmap.org" />
+        <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
+      </head>
       <body className="flex min-h-screen flex-col font-sans">
         <ProveedorScroll>
           <Encabezado />

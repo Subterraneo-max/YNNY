@@ -74,7 +74,7 @@ Lighthouse mobile sobre el build de producción:
 
 | | Home | Carta | Sucursales |
 |---|---|---|---|
-| Performance | 80 | 90 | 93 |
+| Performance | 80 | 90 | 93 → 81 con el mapa |
 | Accesibilidad | 100 | 100 | 100 |
 | Buenas prácticas | 100 | 100 | 100 |
 | SEO | 100\* | 100\* | 100\* |
@@ -94,6 +94,43 @@ buscadores. Con `esDemo: false` da 100 y sin fallas.
 La home sigue siendo la página más pesada porque es la que más cosas anima. Si en algún
 momento pesa más el número que el efecto, lo que más recupera es sacar el parallax del
 hero y las marquesinas.
+
+## El mapa de sucursales
+
+`src/components/MapaLeaflet.tsx` es un mapa navegable de verdad, con las 10 sucursales
+marcadas sobre las mismas coordenadas que usan los botones de "Cómo llegar". Antes había
+un esquema en SVG: se veía como un recuadro con puntos y no le decía nada a nadie.
+
+Por qué Leaflet + tiles de OpenStreetMap y no Google Maps embebido:
+
+- No necesita clave de API ni cuenta de facturación.
+- No pone cookies de terceros ni pide consentimiento.
+- El iframe de Google pesa cerca de 900 KB; esto son ~45 KB de Leaflet más los tiles.
+- Con un iframe de OSM (lo que se usó en el proyecto de Bistrea) solo se puede poner
+  **un** marcador. Acá hacen falta diez, así que el mapa se arma a mano.
+
+Detalles que importan en el celular:
+
+- **La rueda del mouse no hace zoom** y **arrastrar con un dedo no mueve el mapa**: en
+  las dos cosas gana el scroll de la página. El zoom queda en los botones `+ / −` y en
+  el gesto de pellizcar.
+- El mapa se pide **después de que la página terminó de cargar** y solo si la sección
+  llega a asomarse en pantalla. El marco vacío tiene el mismo alto que el mapa, así que
+  no hay salto de layout (CLS 0).
+- Al tocar un pin se abre el nombre, la dirección y "Cómo llegar", que abre la app de
+  Maps del teléfono.
+- Cuando la persona comparte su ubicación, el pin de la sucursal más cercana se pone
+  verde y el mapa vuela hasta ella.
+
+**Lo que cuesta, medido:** `/sucursales` bajó de 95 a ~81 de performance en Lighthouse
+mobile y el LCP pasó de 2,8 s a 4,9 s, porque el elemento más grande de la pantalla
+inicial pasó a ser un tile del mapa. Buenas prácticas baja de 100 a 96 por
+`image-size-responsive`: los tiles son de 256 px y en una pantalla retina se ven
+estirados. Las dos cosas son inherentes a poner un mapa raster de verdad y le pasan
+igual a Google Maps embebido. Si en algún momento pesa más el número que el mapa, el
+camino es un proveedor de tiles con soporte retina (MapTiler, Carto, Stadia), que
+además hay que contratar si esto sale a producción con tráfico real: los servidores de
+OpenStreetMap son para volumen bajo.
 
 ## Horarios y "abierto ahora"
 

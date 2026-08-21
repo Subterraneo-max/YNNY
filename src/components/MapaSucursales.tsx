@@ -1,83 +1,101 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 import type { Sucursal } from "@/data/sucursales";
 
 /**
- * Esquema de las sucursales en la ciudad, dibujado en SVG a partir de las coordenadas
- * reales. No es un mapa navegable a propósito: embeber Google Maps costaría medio
- * segundo de carga y varios cientos de kilobytes, y lo que la persona necesita
- * —ver de un vistazo dónde caen los locales y abrir el que le sirve— se resuelve así.
+ * El mapa de sucursales, cargado con cuentagotas.
+ *
+ * Leaflet y los tiles no tienen por qué descargarse si la persona nunca baja
+ * hasta acá, así que el componente real vive en un chunk aparte que se pide
+ * recién cuando la sección se asoma en pantalla. Hasta entonces se ve el marco
+ * con el mismo alto, que es lo que evita que la página salte cuando aparece.
+ *
+ * `ssr: false` es obligatorio: Leaflet toca `window` al importarse.
  */
+const MapaLeaflet = dynamic(
+  () => import("./MapaLeaflet").then((m) => m.MapaLeaflet),
+  { ssr: false, loading: () => <Marco /> },
+);
+
+function Marco() {
+  return (
+    <div className="flex h-full w-full items-center justify-center bg-crema-hondo">
+      <span className="text-xs font-semibold tracking-[0.18em] text-cacao-suave uppercase">
+        Cargando mapa
+      </span>
+    </div>
+  );
+}
+
 export function MapaSucursales({
   sucursales,
   destacadaId,
+  className = "h-[19rem] sm:h-[24rem]",
 }: {
   sucursales: Sucursal[];
   destacadaId?: string;
+  className?: string;
 }) {
-  const lats = sucursales.map((s) => s.lat);
-  const lngs = sucursales.map((s) => s.lng);
-  const latMin = Math.min(...lats);
-  const latMax = Math.max(...lats);
-  const lngMin = Math.min(...lngs);
-  const lngMax = Math.max(...lngs);
+  const caja = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
 
-  // Un grado de longitud es más corto que uno de latitud, y a la altura de Rosario
-  // esa diferencia ronda el 16%. Sin corregirla el plano sale estirado a lo ancho.
-  const factorLng = Math.cos((((latMin + latMax) / 2) * Math.PI) / 180);
+  useEffect(() => {
+    const nodo = caja.current;
+    if (!nodo) return;
 
-  const ancho = (lngMax - lngMin) * factorLng;
-  const alto = latMax - latMin;
-  const escala = 100 / Math.max(ancho, alto);
-  const margen = 12;
+    let observador: IntersectionObserver | null = null;
 
-  const posicion = (s: Sucursal) => ({
-    x: margen + (s.lng - lngMin) * factorLng * escala,
-    y: margen + (latMax - s.lat) * escala,
-  });
+    // Los tiles no pueden pelearle ancho de banda al primer pintado: hasta que la
+    // página no terminó de cargar, el mapa ni se pide.
+    const cuandoCargue = (fn: () => void) => {
+      if (document.readyState === "complete") {
+        fn();
+        return () => {};
+      }
+      window.addEventListener("load", fn, { once: true });
+      return () => window.removeEventListener("load", fn);
+    };
 
-  const anchoVista = ancho * escala + margen * 2;
-  const altoVista = alto * escala + margen * 2;
+    const arrancar = () => {
+      // Sin IntersectionObserver (navegadores viejos) se carga y listo: es peor
+      // quedarse sin mapa que cargarlo antes de tiempo.
+      if (typeof IntersectionObserver === "undefined") {
+        setVisible(true);
+        return;
+      }
+
+      observador = new IntersectionObserver(
+        ([entrada]) => {
+          if (!entrada.isIntersecting) return;
+          setVisible(true);
+          observador?.disconnect();
+        },
+        // Arranca a cargar un poco antes de que se vea, para que llegue a tiempo.
+        { rootMargin: "320px" },
+      );
+
+      observador.observe(nodo);
+    };
+
+    const limpiar = cuandoCargue(arrancar);
+    return () => {
+      limpiar();
+      observador?.disconnect();
+    };
+  }, []);
 
   return (
-    <svg
-      viewBox={`0 0 ${anchoVista} ${altoVista}`}
-      className="h-auto w-full"
-      role="img"
-      aria-label={`Ubicación relativa de las ${sucursales.length} sucursales en Rosario`}
+    <div
+      ref={caja}
+      className={`overflow-hidden border border-borde bg-crema-hondo ${className}`}
     >
-      <defs>
-        <pattern id="trama" width="8" height="8" patternUnits="userSpaceOnUse">
-          <path d="M8 0H0V8" fill="none" stroke="var(--color-borde)" strokeWidth="0.6" />
-        </pattern>
-      </defs>
-
-      <rect width={anchoVista} height={altoVista} fill="url(#trama)" rx="3" />
-
-      {sucursales.map((sucursal) => {
-        const { x, y } = posicion(sucursal);
-        const destacada = sucursal.id === destacadaId;
-        return (
-          <g key={sucursal.id}>
-            {destacada && (
-              <circle cx={x} cy={y} r="7" fill="var(--color-lima)" opacity="0.3">
-                <animate
-                  attributeName="r"
-                  values="5;9;5"
-                  dur="2.4s"
-                  repeatCount="indefinite"
-                />
-              </circle>
-            )}
-            <circle
-              cx={x}
-              cy={y}
-              r={destacada ? 3.6 : 2.4}
-              fill={destacada ? "var(--color-lima-hondo)" : "var(--color-cacao)"}
-              stroke="var(--color-crema)"
-              strokeWidth="1"
-            />
-          </g>
-        );
-      })}
-    </svg>
+      {visible ? (
+        <MapaLeaflet sucursales={sucursales} destacadaId={destacadaId} />
+      ) : (
+        <Marco />
+      )}
+    </div>
   );
 }

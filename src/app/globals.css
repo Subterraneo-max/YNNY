@@ -149,3 +149,141 @@ body {
     animation: none;
   }
 }
+
+/* ---------- Mapa de sucursales (Leaflet) ----------
+
+   Los tiles de OpenStreetMap vienen bastante saturados y al lado del crema y el
+   cacao del resto de la página quedaban como un recorte pegado encima. El filtro
+   los baja de tono y los tira a cálido; va solo sobre la capa de tiles para que
+   los pines y los controles conserven el color de marca.
+*/
+.mapa-sucursales .leaflet-tile-pane {
+  filter: saturate(0.55) sepia(0.16) contrast(0.94) brightness(1.03);
+}
+
+.mapa-sucursales {
+  background: var(--color-crema-hondo);
+  font-family: inherit;
+}
+
+.mapa-sucursales .leaflet-container {
+  font-family: inherit;
+}
+
+/* Pines. El destacado (la sucursal más cercana) late despacio para que se
+   encuentre solo entre los otros nueve. */
+.pin-envoltorio {
+  background: none;
+  border: none;
+}
+
+.pin-sucursal {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--color-cacao);
+  border: 3px solid var(--color-crema);
+  box-shadow: 0 2px 6px rgb(53 41 31 / 0.45);
+}
+
+.pin-sucursal--destacada {
+  width: 26px;
+  height: 26px;
+  background: var(--color-lima);
+  border-color: var(--color-cacao);
+  animation: latido-pin 2.4s ease-in-out infinite;
+}
+
+@keyframes latido-pin {
+  0%,
+  100% {
+    box-shadow: 0 2px 6px rgb(53 41 31 / 0.45), 0 0 0 0 rgb(168 196 30 / 0.55);
+  }
+  50% {
+    box-shadow: 0 2px 6px rgb(53 41 31 / 0.45), 0 0 0 10px rgb(168 196 30 / 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin-sucursal--destacada {
+    animation: none;
+  }
+}
+
+/* Globo de información. Leaflet trae esquinas redondeadas y azul de sistema;
+   acá va cuadrado y con la paleta, como el resto de las tarjetas. */
+.mapa-sucursales .leaflet-popup-content-wrapper,
+.mapa-sucursales .leaflet-popup-tip {
+  background: var(--color-crema);
+  color: var(--color-cacao);
+  border-radius: 2px;
+  box-shadow: 0 10px 30px -8px rgb(53 41 31 / 0.4);
+}
+
+.mapa-sucursales .leaflet-popup-content {
+  margin: 0.85rem 1rem;
+}
+
+.popup-sucursal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.popup-sucursal strong {
+  font-weight: 800;
+  font-stretch: 125%;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-size: 0.95rem;
+}
+
+.popup-sucursal span {
+  color: var(--color-cacao-suave);
+  font-size: 0.8rem;
+}
+
+.mapa-sucursales.leaflet-container .popup-sucursal a {
+  margin-top: 0.5rem;
+  align-self: flex-start;
+  background: var(--color-lima);
+  color: var(--color-cacao);
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 2px;
+  text-decoration: none;
+}
+
+.mapa-sucursales.leaflet-container .popup-sucursal a:hover {
+  background: var(--color-cacao);
+  color: var(--color-crema);
+}
+
+/* Controles y crédito, en la misma paleta.
+
+   Leaflet pinta sus enlaces de azul con `.leaflet-container a`, que tiene la
+   misma especificidad que un `.clase a` mío y gana por venir después en la hoja.
+   Encadenar su propia clase (`.mapa-sucursales.leaflet-container`) es lo que
+   destraba eso sin recurrir a `!important`. */
+.mapa-sucursales .leaflet-bar a {
+  background: var(--color-crema);
+  color: var(--color-cacao);
+  border-bottom-color: var(--color-borde);
+}
+
+.mapa-sucursales .leaflet-bar a:hover {
+  background: var(--color-crema-hondo);
+  color: var(--color-cacao);
+}
+
+.mapa-sucursales.leaflet-container .leaflet-control-attribution {
+  background: rgb(240 234 224 / 0.85);
+  color: var(--color-cacao-suave);
+  font-size: 0.65rem;
+}
+
+.mapa-sucursales.leaflet-container .leaflet-control-attribution a {
+  color: var(--color-lima-hondo);
+}

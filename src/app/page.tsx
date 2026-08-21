@@ -122,8 +122,13 @@ export default function Inicio() {
             </Revelar>
           </div>
 
-          <Revelar desde="escala" className="mx-auto w-full max-w-sm">
-            <MapaSucursales sucursales={sucursales} />
+          {/*
+            Pegado a la derecha y con tope de ancho: el título de al lado es
+            una sola palabra larguísima que se desborda de su columna, y si el
+            mapa arranca antes se le monta encima en pantallas de 1024 px.
+          */}
+          <Revelar desde="escala" className="w-full max-w-[22rem] lg:ml-auto">
+            <MapaSucursales sucursales={sucursales} className="h-[19rem] sm:h-[22rem]" />
           </Revelar>
         </div>
       </section>
