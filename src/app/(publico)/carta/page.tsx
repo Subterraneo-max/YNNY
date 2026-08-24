@@ -2,18 +2,27 @@ import type { Metadata } from "next";
 import { CartaNavegable } from "@/components/CartaNavegable";
 import { Marquesina } from "@/components/Marquesina";
 import { TituloEntrada } from "@/components/TituloEntrada";
-import { cantidadRedonda, categorias } from "@/data/menu";
+import { cantidadRedonda, leerCarta } from "@/lib/carta";
 import { sitio } from "@/lib/sitio";
 
-export const metadata: Metadata = {
-  title: "Carta",
-  // Nombrar las categorías acá es lo que hace que la carta aparezca en Google.
-  description: `Carta completa de ${sitio.nombre}: ${categorias
-    .map((categoria) => categoria.nombre.toLowerCase())
-    .join(", ")}. Precios actualizados.`,
-};
+/**
+ * La descripción nombra las categorías reales, que es lo que hace que la carta
+ * aparezca en Google. Como ahora salen de la base, se arma en `generateMetadata`
+ * y no en una constante: si YNNY agrega una categoría, el SEO la acompaña.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const carta = await leerCarta();
+  return {
+    title: "Carta",
+    description: `Carta completa de ${sitio.nombre}: ${carta.categorias
+      .map((categoria) => categoria.nombre.toLowerCase())
+      .join(", ")}. Precios actualizados.`,
+  };
+}
 
-export default function PaginaCarta() {
+export default async function PaginaCarta() {
+  const carta = await leerCarta();
+
   return (
     <>
       <div className="mx-auto max-w-3xl px-4 pt-32 pb-8 sm:pt-40">
@@ -27,19 +36,19 @@ export default function PaginaCarta() {
         />
         <div className="entra" style={{ "--d": 220 } as React.CSSProperties}>
           <p className="mt-5 max-w-xl leading-relaxed text-cacao-suave">
-            Más de {cantidadRedonda} opciones en {categorias.length} categorías, todas
+            Más de {cantidadRedonda(carta.categorias)} opciones en {carta.categorias.length} categorías, todas
             recién hechas. Buscá lo que quieras o elegí una categoría.
           </p>
         </div>
       </div>
 
       <Marquesina
-        textos={categorias.map((categoria) => categoria.nombre.toUpperCase())}
+        textos={carta.categorias.map((categoria) => categoria.nombre.toUpperCase())}
         velocidad={28}
       />
 
       <div className="mx-auto max-w-3xl px-4 pb-24">
-        <CartaNavegable />
+        <CartaNavegable categorias={carta.categorias} />
       </div>
     </>
   );

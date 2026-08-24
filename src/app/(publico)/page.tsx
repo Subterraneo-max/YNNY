@@ -8,36 +8,42 @@ import { MapaSucursales } from "@/components/MapaSucursales";
 import { Marquesina } from "@/components/Marquesina";
 import { Revelar } from "@/components/Revelar";
 import { TituloRevelado } from "@/components/TituloRevelado";
-import { categorias } from "@/data/menu";
+import { cantidadRedonda, destacadosDe, favoritosDe, leerCarta } from "@/lib/carta";
 import { horarios, sucursales } from "@/data/sucursales";
 import { sitio } from "@/lib/sitio";
 
-const nombresCategorias = categorias.map((categoria) => categoria.nombre.toUpperCase());
+export default async function Inicio() {
+  const carta = await leerCarta();
+  const nombresCategorias = carta.categorias.map((categoria) => categoria.nombre.toUpperCase());
+  const favoritos = favoritosDe(carta.categorias);
 
-export default function Inicio() {
   return (
     <>
-      <Hero />
+      <Hero cantidadRedonda={cantidadRedonda(carta.categorias)} />
 
       <Marquesina textos={nombresCategorias} velocidad={30} />
 
-      {/* ---------- Favoritos ---------- */}
-      <section className="py-20 sm:py-28">
-        <div className="mx-auto mb-10 max-w-6xl px-4">
-          <TituloRevelado
-            texto="Los favoritos de YNNY"
-            como="h2"
-            className="display text-[clamp(2.2rem,8vw,5rem)]"
-          />
-          <Revelar retraso={0.15}>
-            <p className="mt-4 max-w-md leading-relaxed text-cacao-suave">
-              Lo que más se pide en el mostrador, todos los días.
-            </p>
-          </Revelar>
-        </div>
+      {/* ---------- Favoritos ----------
+          Si en el panel no queda ningún producto destacado, la sección entera
+          no se renderiza: un título grande sin tarjetas debajo se ve roto. */}
+      {favoritos.length > 0 && (
+        <section className="py-20 sm:py-28">
+          <div className="mx-auto mb-10 max-w-6xl px-4">
+            <TituloRevelado
+              texto="Los favoritos de YNNY"
+              como="h2"
+              className="display text-[clamp(2.2rem,8vw,5rem)]"
+            />
+            <Revelar retraso={0.15}>
+              <p className="mt-4 max-w-md leading-relaxed text-cacao-suave">
+                Lo que más se pide en el mostrador, todos los días.
+              </p>
+            </Revelar>
+          </div>
 
-        <Favoritos />
-      </section>
+          <Favoritos favoritos={favoritos} />
+        </section>
+      )}
 
       {/* ---------- Escaparate por categoría ---------- */}
       <section className="bg-crema-hondo py-20 sm:py-28">
@@ -54,7 +60,7 @@ export default function Inicio() {
           </Revelar>
         </div>
 
-        <CarruselDestacados />
+        <CarruselDestacados destacados={destacadosDe(carta.categorias)} />
 
         <div className="mx-auto mt-8 max-w-6xl px-4">
           <Revelar>
@@ -83,7 +89,7 @@ export default function Inicio() {
             className="display text-[clamp(2.2rem,8vw,5rem)]"
           />
         </div>
-        <FilasCategorias />
+        <FilasCategorias categorias={carta.categorias} />
       </section>
 
       <Marquesina textos={["TODO RECIÉN HECHO", "TODOS LOS DÍAS", `${sucursales.length} SUCURSALES`]} velocidad={24} />
@@ -163,13 +169,14 @@ export default function Inicio() {
               seis veces más recargaba la sección sin agregar nada.
             */}
             <Revelar escalonar className="grid grid-cols-3 gap-2 sm:gap-3">
-              {categorias.slice(0, 3).map((categoria) => (
+              {carta.categorias.slice(0, 3).map((categoria) => (
                 <div
                   key={categoria.slug}
-                  className="aspect-square overflow-hidden rounded-xl shadow-[0_10px_24px_-12px_rgb(53_41_31_/_0.4)]"
+                  className="relative aspect-square overflow-hidden rounded-xl shadow-[0_10px_24px_-12px_rgb(53_41_31_/_0.4)]"
                 >
                   <FotoCategoria
                     slug={categoria.slug}
+                    fotoUrl={categoria.fotoUrl}
                     sizes="(min-width: 1024px) 160px, 30vw"
                   />
                 </div>

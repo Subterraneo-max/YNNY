@@ -15,6 +15,9 @@ npm run dev      # http://localhost:3000
 npm run build    # build de producción
 ```
 
+Sin `.env.local` funciona igual: la carta sale del archivo de respaldo y `/admin` explica
+qué falta. Para conectar la base de verdad, ver `supabase/README.md`.
+
 ## Qué hay
 
 | Ruta | Qué es |
@@ -22,9 +25,67 @@ npm run build    # build de producción
 | `/` | Home: hero, escaparate de precios, categorías, mapa de sucursales |
 | `/carta` | 72 productos en 8 categorías, con buscador y navegación por categoría |
 | `/sucursales` | Las 10, con "cuál me queda más cerca" y WhatsApp por local |
+| `/admin` | Panel privado para editar la carta. Pide mail y contraseña |
 
-Los datos viven en dos archivos y son lo único que se toca para replicar esto en otro
-negocio: `src/data/menu.ts` y `src/data/sucursales.ts`.
+Las sucursales viven en `src/data/sucursales.ts` y se tocan a mano. La carta vive en
+Supabase y se edita desde `/admin`; `src/data/menu.ts` quedó como semilla y respaldo.
+
+## El panel de administración
+
+`/admin` deja cambiar precios, agregar y sacar productos, marcar agotados, elegir los
+favoritos de la portada y reemplazar fotos, sin tocar código ni hacer deploy.
+
+### Cómo está armado
+
+```
+alguien guarda en /admin
+  → Server Action (corre en el servidor, valida y escribe)
+  → Supabase guarda el cambio
+  → updateTag("carta") + revalidatePath("/", "/carta")
+  → la próxima visita ya ve el dato nuevo
+```
+
+La clave está en el caché. La web pública **no** lee Supabase en cada visita: la lee una
+vez, guarda el resultado con la etiqueta `carta` y sirve las páginas estáticas desde el
+CDN. Al guardar en el panel se invalida esa etiqueta y nada más. Por eso `/` y `/carta`
+siguen apareciendo como `○ Static` en el build aunque los datos vengan de una base.
+
+| Archivo | Qué hace |
+|---|---|
+| `src/lib/carta/index.ts` | `leerCarta()`: única puerta de entrada a los datos |
+| `src/lib/carta/remota.ts` | Lee de Supabase con `fetch` cacheado y etiquetado |
+| `src/lib/carta/local.ts` | El respaldo, armado desde `src/data/menu.ts` |
+| `src/lib/carta/derivados.ts` | Favoritos, escaparate, buscador, formato de precios |
+| `src/lib/carta/admin.ts` | Lectura del panel: sin caché y con lo desactivado incluido |
+| `src/lib/supabase/` | Clientes (servidor / navegador) y variables de entorno |
+| `src/app/admin/acciones.ts` | Todas las escrituras, en un solo archivo |
+| `src/proxy.ts` | Refresca la sesión. Solo corre en `/admin` |
+| `supabase/01-esquema.sql` | Tablas, índices, RLS y bucket de fotos |
+| `supabase/02-semilla.sql` | Los 72 productos actuales. Generado, no escrito a mano |
+
+### La regla que no se negocia
+
+**La web pública nunca se cae por Supabase.** Si no hay variables de entorno, si la base
+está caída o si devuelve una carta vacía, `leerCarta()` sirve la transcripción local del
+PDF y deja el motivo en los logs. El visitante puede llegar a ver precios viejos; nunca
+una pantalla de error.
+
+### Seguridad
+
+- Quien decide quién escribe son las **políticas RLS** de Postgres, no la interfaz.
+  Esconder `/admin` no protege nada y no se usa como si lo hiciera.
+- Estar logueado **no alcanza**: hay que estar en la tabla `administradores`.
+- La clave que usa el proyecto es la **anónima**, que es pública por diseño. La
+  `service_role` no aparece en ningún archivo y no hace falta.
+- La sesión vive en cookies `httpOnly`: el token no es accesible desde JavaScript.
+- El precio y el resto de los campos se validan del lado del servidor, no del formulario.
+
+### Regenerar la semilla
+
+```bash
+npm run semilla           # src/data/menu.ts  →  supabase/02-semilla.sql
+npm run verificar-carta   # compara Supabase contra el archivo local, producto por producto
+```
 
 ## Diseño
 

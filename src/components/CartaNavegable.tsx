@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { FotoCategoria } from "@/components/FotoCategoria";
-import { categorias, formatearPrecio, todosLosProductos } from "@/data/menu";
+import { aplanarProductos, formatearPrecio } from "@/lib/carta/derivados";
+import type { CategoriaCarta } from "@/lib/carta/tipos";
 
 /** Para que "arabe" encuentre "Árabe" y "cafe" encuentre "café". */
 const normalizar = (texto: string) =>
@@ -16,20 +17,28 @@ function FilaProducto({
   descripcion,
   precio,
   contexto,
+  disponible = true,
   ocultarPrecio = false,
 }: {
   nombre: string;
-  descripcion?: string;
+  descripcion?: string | null;
   precio: number | null;
   contexto?: string;
+  /** En false el producto se muestra igual, pero apagado y con el cartel de agotado. */
+  disponible?: boolean;
   /** Para las categorías donde el precio ya se anunció una sola vez arriba. */
   ocultarPrecio?: boolean;
 }) {
   return (
-    <li className="group flex items-baseline gap-3 py-3.5">
+    <li className={`group flex items-baseline gap-3 py-3.5 ${disponible ? "" : "opacity-55"}`}>
       <div className="min-w-0 flex-1">
         <p className="font-semibold leading-snug transition-colors group-hover:text-lima-hondo">
           {nombre}
+          {!disponible && (
+            <span className="ml-2 align-middle rounded-sm border border-cacao/30 px-1.5 py-0.5 text-[0.65rem] font-bold tracking-wide text-cacao-suave uppercase">
+              Agotado
+            </span>
+          )}
         </p>
         {descripcion && (
           <p className="mt-0.5 text-sm leading-snug text-cacao-suave">{descripcion}</p>
@@ -65,8 +74,12 @@ function suscribirAlHash(alCambiar: () => void) {
   return () => window.removeEventListener("hashchange", alCambiar);
 }
 
-export function CartaNavegable() {
+export function CartaNavegable({ categorias }: { categorias: CategoriaCarta[] }) {
   const barraBusqueda = useRef<HTMLDivElement>(null);
+
+  // Aplanar 72 productos es barato, pero se rehace en cada tecla del buscador si
+  // no se memoiza: la lista solo cambia cuando cambia la carta.
+  const todosLosProductos = useMemo(() => aplanarProductos(categorias), [categorias]);
 
   /**
    * Publica el alto de la barra de búsqueda para que los anclajes de categoría
@@ -107,7 +120,7 @@ export function CartaNavegable() {
         `${producto.nombre} ${producto.descripcion ?? ""} ${producto.grupoNombre ?? ""} ${producto.categoriaNombre}`,
       ).includes(termino),
     );
-  }, [busqueda]);
+  }, [busqueda, todosLosProductos]);
 
   return (
     <>
@@ -181,6 +194,7 @@ export function CartaNavegable() {
                     nombre={producto.nombre}
                     descripcion={producto.descripcion}
                     precio={producto.precio}
+                    disponible={producto.disponible}
                     contexto={
                       producto.grupoNombre
                         ? `${producto.categoriaNombre} · ${producto.grupoNombre}`
@@ -206,9 +220,12 @@ export function CartaNavegable() {
                 <div
                   className="flex items-end gap-4 border-b-2 border-cacao pb-3"
                 >
-                  <div className="size-14 shrink-0 overflow-hidden rounded-xl shadow-[0_10px_22px_-10px_rgb(53_41_31_/_0.4)] sm:size-20">
+                  {/* `relative` es lo que necesita el `fill` de next/image cuando
+                      la foto viene del panel y no se conoce su tamaño. */}
+                  <div className="relative size-14 shrink-0 overflow-hidden rounded-xl shadow-[0_10px_22px_-10px_rgb(53_41_31_/_0.4)] sm:size-20">
                     <FotoCategoria
                       slug={categoria.slug}
+                      fotoUrl={categoria.fotoUrl}
                       sizes="(min-width: 640px) 80px, 56px"
                     />
                   </div>
@@ -227,7 +244,7 @@ export function CartaNavegable() {
                     <h2 className="display text-[clamp(1.35rem,6vw,2.8rem)]">
                       {categoria.nombre}
                     </h2>
-                    {categoria.precioUnico && (
+                    {categoria.precioUnico !== null && (
                       <p className="display text-lg text-lima-hondo sm:shrink-0 sm:pb-1">
                         Todas {formatearPrecio(categoria.precioUnico)}
                       </p>
@@ -241,8 +258,8 @@ export function CartaNavegable() {
                   </p>
                 )}
 
-                {categoria.grupos.map((grupo, indice) => (
-                  <div key={grupo.nombre ?? indice} className="mt-6">
+                {categoria.grupos.map((grupo) => (
+                  <div key={grupo.id} className="mt-6">
                     {grupo.nombre && (
                       <h3 className="text-xs font-bold tracking-[0.18em] text-cacao-suave uppercase">
                         {grupo.nombre}
@@ -251,13 +268,14 @@ export function CartaNavegable() {
                     <ul className="divide-y divide-borde">
                       {grupo.productos.map((producto) => (
                         <FilaProducto
-                          key={producto.nombre}
+                          key={producto.id}
                           nombre={producto.nombre}
                           descripcion={producto.descripcion}
                           precio={producto.precio}
+                          disponible={producto.disponible}
                           // Si toda la categoría vale lo mismo ya se anunció arriba:
                           // repetirlo en cada renglón sólo agrega ruido.
-                          ocultarPrecio={categoria.precioUnico !== undefined}
+                          ocultarPrecio={categoria.precioUnico !== null}
                         />
                       ))}
                     </ul>

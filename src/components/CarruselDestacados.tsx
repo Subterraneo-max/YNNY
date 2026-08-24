@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { FotoCategoria } from "@/components/FotoCategoria";
 import { Revelar } from "@/components/Revelar";
-import { destacados, formatearPrecio } from "@/data/menu";
+import { formatearPrecio } from "@/lib/carta/derivados";
+import type { ProductoEscaparate } from "@/lib/carta/derivados";
 
 /**
  * Escaparate horizontal, como la fila de tazas de la referencia.
@@ -14,7 +15,7 @@ import { destacados, formatearPrecio } from "@/data/menu";
  * con teclado y no hay que reimplementar la inercia. Las flechas solo empujan
  * ese mismo scroll.
  */
-export function CarruselDestacados() {
+export function CarruselDestacados({ destacados }: { destacados: ProductoEscaparate[] }) {
   const pista = useRef<HTMLUListElement>(null);
   const [alInicio, setAlInicio] = useState(true);
   const [alFinal, setAlFinal] = useState(false);
@@ -64,7 +65,7 @@ export function CarruselDestacados() {
           className="flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pt-20 pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {destacados.map((producto) => (
-            <li key={producto.categoriaSlug} className="w-64 shrink-0 snap-start sm:w-72">
+            <li key={producto.id} className="w-64 shrink-0 snap-start sm:w-72">
               {/* La foto mide 128 px y asoma 64 hacia arriba, así que entra 64 dentro
                   de la tarjeta: el pt-20 es lo que evita que el círculo tape la
                   etiqueta de categoría. Si cambia el tamaño de la foto, cambia acá. */}
@@ -73,6 +74,7 @@ export function CarruselDestacados() {
                   <FotoCategoria
                     slug={producto.categoriaSlug}
                     producto={producto.nombre}
+                    fotoUrl={producto.fotoUrl}
                     sizes="128px"
                   />
                 </div>

@@ -82,6 +82,8 @@ const TEXTOS: Record<string, string> = {
 export function FotoCategoria({
   slug,
   producto,
+  fotoUrl = null,
+  alt,
   className = "",
   sizes,
   prioridad = false,
@@ -89,6 +91,16 @@ export function FotoCategoria({
   slug: string;
   /** Nombre del plato, cuando lo que se anuncia es un producto y no la categoría. */
   producto?: string;
+  /**
+   * Foto subida desde el panel. Cuando viene, manda sobre todo lo demás.
+   *
+   * Es lo que permite migrar las fotos de a una: mientras `fotoUrl` sea null
+   * se sigue usando la imagen local de siempre, así que reemplazar la foto de
+   * un producto no obliga a reemplazar las 12.
+   */
+  fotoUrl?: string | null;
+  /** Texto alternativo propio, para las fotos que no están en las tablas de abajo. */
+  alt?: string;
   className?: string;
   /** Anchos reales de render, para que el navegador no baje una imagen más grande de la necesaria. */
   sizes: string;
@@ -96,19 +108,39 @@ export function FotoCategoria({
 }) {
   // La foto del plato manda sobre la de la categoría; si no hay, cae en la genérica.
   const clave = producto ? `${slug}/${producto}` : null;
-  const foto = (clave && FOTOS_PRODUCTO[clave]) ?? FOTOS[slug];
-  const texto = (clave && TEXTOS_PRODUCTO[clave]) ?? TEXTOS[slug] ?? "";
-  if (!foto) return null;
+  const local = (clave && FOTOS_PRODUCTO[clave]) ?? FOTOS[slug];
+  const texto = alt ?? (clave && TEXTOS_PRODUCTO[clave]) ?? TEXTOS[slug] ?? producto ?? "";
+
+  const clases = `h-full w-full object-cover ${className}`;
+
+  if (fotoUrl) {
+    return (
+      <Image
+        src={fotoUrl}
+        alt={texto}
+        // Las fotos del panel no tienen tamaño conocido en tiempo de compilación,
+        // así que van con `fill` dentro del recorte que ya define el contenedor.
+        // El contenedor siempre tiene alto propio, así que no hay salto de layout.
+        fill
+        loading={prioridad ? undefined : "lazy"}
+        priority={prioridad}
+        sizes={sizes}
+        className={clases}
+      />
+    );
+  }
+
+  if (!local) return null;
 
   return (
     <Image
-      src={foto}
+      src={local}
       alt={texto}
       placeholder="blur"
       loading={prioridad ? undefined : "lazy"}
       priority={prioridad}
       sizes={sizes}
-      className={`h-full w-full object-cover ${className}`}
+      className={clases}
     />
   );
 }

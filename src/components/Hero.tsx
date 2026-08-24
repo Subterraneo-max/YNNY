@@ -6,7 +6,7 @@ import { BuscadorHero } from "@/components/BuscadorHero";
 import { TextoEnLetras } from "@/components/TextoEnLetras";
 import { gsap, registrarGsap, prefiereMenosMovimiento } from "@/lib/animaciones";
 import { sucursales } from "@/data/sucursales";
-import { cantidadRedonda } from "@/data/menu";
+
 import { sitio } from "@/lib/sitio";
 import fotoClose from "@/imagenes/cafe-pasteleria-close.jpg";
 import fotoCozy from "@/imagenes/cafe-pasteleria-cozy.jpg";
@@ -18,7 +18,7 @@ import fotoCozy from "@/imagenes/cafe-pasteleria-cozy.jpg";
  * GSAP acá se ocupa únicamente del parallax, que por definición no puede
  * ocurrir antes de que la persona scrollee.
  */
-export function Hero() {
+export function Hero({ cantidadRedonda }: { cantidadRedonda: number }) {
   const raiz = useRef<HTMLElement>(null);
 
   useEffect(() => {

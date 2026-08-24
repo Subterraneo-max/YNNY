@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
-import { categorias } from "@/data/menu";
+import { leerCarta } from "@/lib/carta";
 import { horarios, sucursales } from "@/data/sucursales";
 import { sitio } from "@/lib/sitio";
 
-export function PieDePagina() {
+/**
+ * Lee la carta por su cuenta en vez de recibirla por props: vive en el layout
+ * raíz, así que pasársela obligaría a que todas las páginas la busquen aunque
+ * no la usen. La lectura está cacheada y compartida, así que no cuesta nada.
+ */
+export async function PieDePagina() {
+  const carta = await leerCarta();
+
   return (
     <footer className="bg-cacao text-crema">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:grid-cols-2 lg:grid-cols-4">
@@ -42,7 +49,7 @@ export function PieDePagina() {
             Carta
           </h2>
           <ul className="mt-4 text-sm">
-            {categorias.map((categoria) => (
+            {carta.categorias.map((categoria) => (
               <li key={categoria.slug}>
                 <Link
                   href={`/carta#${categoria.slug}`}

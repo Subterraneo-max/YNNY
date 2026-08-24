@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { categorias, todosLosProductos } from "@/data/menu";
+import { aplanarProductos, leerCarta } from "@/lib/carta";
 import { sucursales } from "@/data/sucursales";
 import { sitio } from "@/lib/sitio";
 
@@ -23,7 +23,11 @@ const CREMA = "#f0eae0";
 const CACAO = "#35291f";
 const LIMA = "#a8c41e";
 
-export default function Imagen() {
+export default async function Imagen() {
+  const carta = await leerCarta();
+  const cuantosProductos = aplanarProductos(carta.categorias).length;
+  const cuantasCategorias = carta.categorias.length;
+
   return new ImageResponse(
     (
       <div
@@ -116,8 +120,8 @@ export default function Imagen() {
           <div style={{ display: "flex" }}>
             {[
               { dato: String(sucursales.length), etiqueta: "sucursales" },
-              { dato: String(todosLosProductos.length), etiqueta: "productos" },
-              { dato: String(categorias.length), etiqueta: "categorías" },
+              { dato: String(cuantosProductos), etiqueta: "productos" },
+              { dato: String(cuantasCategorias), etiqueta: "categorías" },
               { dato: "7 a 21", etiqueta: "todos los días" },
             ].map((item) => (
               <div

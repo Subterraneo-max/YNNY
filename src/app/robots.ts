@@ -9,7 +9,10 @@ export default function robots(): MetadataRoute.Robots {
   }
 
   return {
-    rules: { userAgent: "*", allow: "/" },
+    // El panel nunca se indexa, ni siquiera en producción. No es una medida de
+    // seguridad —quien protege es RLS— pero no tiene ningún sentido que /admin
+    // aparezca en Google.
+    rules: { userAgent: "*", allow: "/", disallow: "/admin" },
     sitemap: `${sitio.url}/sitemap.xml`,
   };
 }

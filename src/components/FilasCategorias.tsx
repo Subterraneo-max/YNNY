@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { FotoCategoria } from "@/components/FotoCategoria";
-import { categorias, formatearPrecio } from "@/data/menu";
+import { cuantosEn, formatearPrecio } from "@/lib/carta/derivados";
+import type { CategoriaCarta } from "@/lib/carta/tipos";
 import {
   gsap,
   registrarGsap,
@@ -17,7 +18,7 @@ import {
  * referencia. La alternancia solo existe en pantalla ancha: en el celular
  * apilar en zigzag hace que el ojo pierda el hilo.
  */
-export function FilasCategorias() {
+export function FilasCategorias({ categorias }: { categorias: CategoriaCarta[] }) {
   const lista = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
@@ -57,7 +58,7 @@ export function FilasCategorias() {
     <ul ref={lista} className="mx-auto max-w-6xl overflow-x-clip px-4">
       {categorias.map((categoria, indice) => {
         const desdeLaDerecha = indice % 2 === 1;
-        const cuantos = categoria.grupos.reduce((total, g) => total + g.productos.length, 0);
+        const cuantos = cuantosEn(categoria);
 
         return (
           <li key={categoria.slug}>
@@ -69,9 +70,10 @@ export function FilasCategorias() {
             >
               {/* El zoom va en la foto y no en el marco: así la imagen crece dentro
                   del recorte en vez de agrandar el bloque y mover la fila entera. */}
-              <div className="size-20 shrink-0 overflow-hidden rounded-2xl shadow-[0_14px_30px_-12px_rgb(53_41_31_/_0.45)] sm:size-40">
+              <div className="relative size-20 shrink-0 overflow-hidden rounded-2xl shadow-[0_14px_30px_-12px_rgb(53_41_31_/_0.45)] sm:size-40">
                 <FotoCategoria
                   slug={categoria.slug}
+                  fotoUrl={categoria.fotoUrl}
                   sizes="(min-width: 640px) 160px, 96px"
                   className="transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
                 />
@@ -89,7 +91,7 @@ export function FilasCategorias() {
                 </h3>
                 <p className="mt-1.5 text-sm text-cacao-suave">
                   {cuantos} {cuantos === 1 ? "opción" : "opciones"}
-                  {categoria.precioUnico && ` · todas ${formatearPrecio(categoria.precioUnico)}`}
+                  {categoria.precioUnico !== null && ` · todas ${formatearPrecio(categoria.precioUnico)}`}
                 </p>
               </div>
 
