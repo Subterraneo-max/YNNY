@@ -22,63 +22,48 @@ Supabase es la base de datos y el sistema de cuentas. Es gratis en el plan que n
 
 ---
 
-## 2. Crear las tablas
+## 2. Crear las tablas y cargar la carta
 
 1. En el menú de la izquierda, **SQL Editor** (el ícono `>_`).
 2. Apretá **New query**.
-3. Abrí el archivo `supabase/01-esquema.sql` de este proyecto, copiá **todo** el contenido
-   y pegalo en el editor.
+3. Abrí el archivo `supabase/00-instalar-todo.sql` de este proyecto, copiá **todo**
+   (`Ctrl` + `A`, `Ctrl` + `C`) y pegalo en el editor.
 4. Apretá **Run** (o `Ctrl` + `Enter`).
-5. Tiene que decir **Success. No rows returned**. Si dice error, mandámelo.
+5. Tiene que decir **Success**. Si dice error, mandámelo.
 
-Esto crea las tablas, las reglas de seguridad y la carpeta donde van a ir las fotos.
+Eso crea las tablas, las reglas de seguridad, la carpeta de las fotos y carga los 72
+productos, 8 categorías y 18 subtítulos que ya están en la web, con sus precios reales.
 
----
+Para confirmar: menú **Table Editor** → tabla **productos**. Tienen que aparecer 72 filas.
 
-## 3. Cargar la carta
+> Se puede correr dos veces sin miedo: las tablas se crean solo si no existen, y la carta
+> no se toca si ya tiene datos. Nunca va a pisar el trabajo de nadie.
 
-1. **New query** otra vez.
-2. Copiá y pegá todo `supabase/02-semilla.sql`.
-3. **Run**.
-
-Son los 72 productos, 8 categorías y 18 subtítulos que ya están en la web, con sus precios
-reales.
-
-> Este archivo está hecho para que sea imposible pisar el trabajo de nadie: si la tabla ya
-> tiene datos, no hace nada. Podés correrlo dos veces sin miedo.
-
-Para confirmar que cargó: menú **Table Editor** → tabla **productos**. Tienen que aparecer
-72 filas.
+*(Los archivos `01-esquema.sql` y `02-semilla.sql` son las dos mitades de ese mismo
+archivo, por si alguna vez querés correr una sola.)*
 
 ---
 
-## 4. Crear la cuenta de YNNY
+## 3. Crear la cuenta para entrar al panel
 
 1. Menú **Authentication** → **Users**.
 2. Botón **Add user** → **Create new user**.
 3. Poné:
-   - **Email**: el mail con el que va a entrar YNNY (puede ser el tuyo para probar).
-   - **Password**: una contraseña. Anotala.
+   - **Email**: el mail con el que vas a entrar (puede ser el tuyo para probar).
+   - **Password**: la contraseña que quieras. Anotala.
    - Tildá **Auto Confirm User**. Sin esto, la cuenta queda esperando un mail de
      confirmación y no puede entrar.
 4. **Create user**.
-5. En la lista te va a aparecer el usuario. **Copiá su UID** (la columna `UID`, un texto
-   largo tipo `a1b2c3d4-...`). Hacé clic en el usuario si no lo ves entero.
 
-### Habilitarlo para editar
+### Darle permiso de editar
 
 Tener cuenta no alcanza: hay que estar en la lista de administradores. Esto es a propósito.
 
 1. **SQL Editor** → **New query**.
-2. Pegá esto, **reemplazando** las dos cosas entre comillas por el UID y el mail de recién:
-
-```sql
-insert into public.administradores (usuario_id, email)
-values ('PEGA-ACA-EL-UID', 'PEGA-ACA-EL-MAIL')
-on conflict (usuario_id) do nothing;
-```
-
-3. **Run**.
+2. Pegá el contenido de `supabase/03-darme-permiso.sql`, **cambiando** `CAMBIAR-POR-TU-MAIL`
+   por el mail del paso anterior.
+3. **Run**. Abajo tiene que aparecer una fila con ese mail. Si aparece vacío, el mail no
+   coincide con ninguna cuenta.
 
 ### Cerrar el registro público
 
@@ -94,7 +79,7 @@ pero no hay razón para permitir cuentas que no usa nadie.
 
 ---
 
-## 5. Copiar las dos claves
+## 4. Copiar las dos claves
 
 1. Menú **Project Settings** (el engranaje, abajo a la izquierda) → **API Keys**
    (en algunos proyectos figura como **API**).
@@ -115,7 +100,7 @@ pero no hay razón para permitir cuentas que no usa nadie.
 
 ---
 
-## 6. Pegar las claves · en tu computadora
+## 5. Pegar las claves · en tu computadora
 
 En la carpeta del proyecto, creá un archivo llamado **`.env.local`** (así, con el punto
 adelante) con estas dos líneas:
@@ -140,7 +125,7 @@ Y entrá a http://localhost:3000/admin
 
 ---
 
-## 7. Pegar las claves · en Vercel
+## 6. Pegar las claves · en Vercel
 
 1. Entrá a **https://vercel.com** y abrí el proyecto **ynny**.
 2. **Settings** (arriba) → **Environment Variables** (menú de la izquierda).
@@ -156,16 +141,16 @@ Y entrá a http://localhost:3000/admin
    **Deployments**, buscá el último, apretá los tres puntos **⋯** → **Redeploy**.
 
 Cuando termine, `https://ynny-omega.vercel.app/admin` va a pedirte el mail y la contraseña
-del paso 4.
+del paso 3.
 
 ---
 
-## 8. Comprobar que todo quedó bien
+## 7. Comprobar que todo quedó bien
 
 Con `.env.local` cargado, en la carpeta del proyecto:
 
 ```bash
-npx tsx scripts/verificar-carta.ts
+npm run verificar-carta
 ```
 
 Compara los 72 productos y sus precios contra la base y te dice si hay alguna diferencia.
@@ -174,7 +159,7 @@ Tiene que decir **"Sin diferencias"**.
 Después probá esto a mano:
 
 1. Entrá a `/admin` **sin haber iniciado sesión**: te tiene que mandar al login.
-2. Entrá con la cuenta del paso 4.
+2. Entrá con la cuenta del paso 3.
 3. Cambiale el precio a un producto y guardá.
 4. Abrí `/carta` en otra pestaña: el precio nuevo tiene que estar ahí, sin hacer nada más.
 
@@ -195,8 +180,8 @@ volver a generarlas y Supabase no contesta, se usa la carta de respaldo del cód
 que puede pasar es que se vean precios viejos, nunca un error.
 
 **¿Puedo sumar otra persona que edite?**
-Sí: creá el usuario en Authentication (paso 4) y agregalo a `administradores` con el mismo
-SQL. Nada más.
+Sí: creá el usuario en Authentication (paso 3) y agregalo a `administradores` corriendo otra vez
+`03-darme-permiso.sql` con su mail. Nada más.
 
 **Perdí la contraseña del panel.**
 Authentication → Users → los tres puntos del usuario → **Send password recovery** o
