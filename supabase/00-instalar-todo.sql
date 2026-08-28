@@ -205,6 +205,32 @@ create policy "carta borrado admin" on storage.objects
   for delete using (bucket_id = 'carta' and public.es_administrador());
 
 
+-- -----------------------------------------------------------------------------
+--  5. Permisos de la API
+--
+--  RLS decide QUÉ FILAS puede ver o tocar cada uno. Esto otro decide si el rol
+--  llega siquiera a la tabla. Son dos capas distintas y hacen falta las dos.
+--
+--  Supabase suele dar estos permisos solo cuando está tildado "Automatically
+--  expose new tables" al crear el proyecto. Los escribimos igual para que este
+--  archivo funcione con ese cartel tildado o destildado.
+--
+--  `anon`  = cualquier visitante de la web (solo lee, y solo lo activo).
+--  `authenticated` = alguien con sesión iniciada; que además pueda escribir lo
+--  siguen decidiendo las políticas de arriba, que exigen estar en
+--  `administradores`.
+-- -----------------------------------------------------------------------------
+
+grant usage on schema public to anon, authenticated;
+
+grant select on public.categorias, public.grupos, public.productos to anon, authenticated;
+grant insert, update, delete on public.categorias, public.grupos, public.productos to authenticated;
+
+grant select on public.administradores to authenticated;
+
+grant execute on function public.es_administrador() to anon, authenticated;
+
+
 -- =============================================================================
 --  YNNY · Semilla de la carta
 --
